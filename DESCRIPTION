@@ -10,3 +10,4 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 3.6.2)
+    R6 (>= 2.4.1)
