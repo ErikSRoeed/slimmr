@@ -41,7 +41,7 @@ Script <- R6Class("Script",
     script = c(),
 
     findinline = function(tofind, after = 1, first = FALSE) {
-      searchresults = sapply((after + 1) : length(private$script), function(l) regexpr(tofind, private$script[l]))
+      searchresults = sapply((after + 1) : length(private$script), function(l) regexpr(tofind, private$script[l], fixed = TRUE))
       foundlines = ((after + 1) : length(private$script))[which(searchresults != -1 & if(first) searchresults == 1)]
       return(foundlines)
     }

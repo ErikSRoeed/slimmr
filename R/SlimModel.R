@@ -32,7 +32,6 @@ SlimModel <- R6Class("SlimModel",
     print = function() {
       cat("-==|| slimmr SLiM model ||===========================================-\n\n")
       cat(private$description, "\n\n")
-      cat("Parameters: ", private$params, "\n")
       cat(ifelse(private$tmp, "Temporary file: ", "File: "), private$filename, "\n")
       cat("\n-====================================================================-")
     },
@@ -78,7 +77,7 @@ SlimModel <- R6Class("SlimModel",
 
     updateblocks = function() {
       for (block in private$scriptblocks) {
-        firstline <- paste(block$type, sep = "")
+        firstline <- paste(block$type, "(", sep = "")
         lastline <- "}"
         scriptfirst <- private$findinline(firstline, after = 0, first = TRUE)
         scriptlast <- private$findinline(lastline, after = scriptfirst, first = TRUE)
@@ -90,7 +89,6 @@ SlimModel <- R6Class("SlimModel",
     description = c(),
     filename = c(),
     scriptblocks = list(),
-    params = c(),
     mutationtypes = list(),
     genomicelementtypes = list(),
     genomicelements = list(),
