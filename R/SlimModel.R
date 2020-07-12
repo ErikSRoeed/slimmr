@@ -12,13 +12,14 @@ SlimModel <- R6Class("SlimModel",
     initialize = function(description, scriptfile = NULL, type = "WF", mu = 1e-8, rho = 1e-8, sex = "", dimensions = "", periodicity = "") {
       if (!is.null(scriptfile)) {
         private$script <- readLines(scriptfile)
+        private$getblocks()
         copyfile <- paste(gsub(".slim", "", scriptfile), "_slimmr.slim", sep = "")
         file.copy(from = scriptfile, to = copyfile)
         private$filename <- copyfile
         private$tmp <- FALSE
       } else {
         private$scriptblocks <- append(private$scriptblocks,
-                                       ScriptBlock$new(type = "initialize", '%typ%' = type, '%dim%' = dimensions,
+                                       ScriptBlock$new(type = "initialize()", '%typ%' = type, '%dim%' = dimensions,
                                                        '%per%' = periodicity, '%sex%' = sex, '%mu%' = mu, '%rho%' = rho)
                                        )
         private$script <- private$writefromblocks()
@@ -30,10 +31,12 @@ SlimModel <- R6Class("SlimModel",
     },
 
     print = function() {
-      cat("-==|| slimmr SLiM model ||===========================================-\n\n")
-      cat(private$description, "\n\n")
-      cat(ifelse(private$tmp, "Temporary file: ", "File: "), private$filename, "\n")
-      cat("\n-====================================================================-")
+      cat("-/ slimmr SLiM model /-\n\n\n")
+      cat("  ", private$description, "\n\n")
+      cat(" Lines: ", length(private$script), "\n")
+      cat(" Blocks: ", length(private$scriptblocks), "\n")
+      cat("\n", ifelse(private$tmp, "Temporary file: ", "File: "), private$filename)
+      cat("\n\n\n-/ slimmr v 0.1.0 /-")
     },
 
     savetofile = function(path, filename) {
@@ -77,7 +80,7 @@ SlimModel <- R6Class("SlimModel",
 
     updateblocks = function() {
       for (block in private$scriptblocks) {
-        firstline <- paste(block$type, "(", sep = "")
+        firstline <- paste(block$type, sep = "")
         lastline <- "}"
         scriptfirst <- private$findinline(firstline, after = 0, first = TRUE)
         scriptlast <- private$findinline(lastline, after = scriptfirst, first = TRUE)
@@ -85,9 +88,41 @@ SlimModel <- R6Class("SlimModel",
       }
     },
 
+    getblocks = function() {
+      toplevel <- which(sapply(private$script, function(l) {
+        l != "" &&
+          !grepl("  ", substr(l, 1, 2), fixed = TRUE)[1] &&
+          !grepl("\t", substr(l, 1, 2), fixed = TRUE)[1] &&
+          !grepl("//", substr(l, 1, 2), fixed = TRUE)[1]
+      }))
+
+      for(t in seq(1, length(toplevel), 2)) {
+        header <- names(toplevel)[t]
+
+        if(suppressWarnings(is.na(as.integer(strsplit(header, "", fixed = TRUE)[[1]][1])))) {
+          if(substr(header, 1, 8) == "function") {
+            type <- substr(header, regexpr("(", header, fixed = TRUE)[1], tail(gregexpr(")", func, fixed = TRUE)[[1]], 1))
+          } else {
+            type <- trimws(sub("{", "", header, fixed = TRUE))
+          }
+        } else {
+          type <- ifelse(grepl("(", header, fixed = TRUE), substr(header, 1, regexpr(")", header, fixed = TRUE)[1]), trimws(sub("{", "", header, fixed = TRUE)))
+        }
+
+        private$scriptblocks <- append(private$scriptblocks, ScriptBlock$new(type = type, prewritten = private$script[toplevel[t] : toplevel[(t + 1)]]))
+      }
+    },
+
+    deep_clone = function(name, value) {
+      if(name == "filename") return(tempfile("slimmr_", fileext = ".slim"))
+      if(name == "tmp") return(TRUE)
+      if(name == "scriptblocks") return(lapply(private$scriptblocks, function(sb) sb$clone(deep = TRUE)))
+      else return(value)
+    },
+
     tmp = TRUE,
-    description = c(),
-    filename = c(),
+    description = "",
+    filename = "",
     scriptblocks = list(),
     mutationtypes = list(),
     genomicelementtypes = list(),

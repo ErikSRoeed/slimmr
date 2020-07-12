@@ -9,14 +9,19 @@ ScriptBlock <- R6Class("ScriptBlock",
 
   public = list(
 
-    initialize = function(type, ...) {
+    initialize = function(type, prewritten = NULL, ...) {
+
       self$type <- type
-      private$script <- readLines(paste("SLiM/block_", type, ".slim", sep = ""))
 
-      arg = list(...)
-      argnames = names(arg)
+      if (is.null(prewritten)) {
+        private$script <- readLines(paste("SLiM/block_", type, ".slim", sep = ""))
+        arg = list(...)
+        argnames = names(arg)
+        self$replacetext(NULL, as.character(argnames), as.character(arg), display = FALSE)
+      } else {
+        private$script <- prewritten
+      }
 
-      self$replacetext(NULL, as.character(argnames), as.character(arg), display = FALSE)
     },
 
     writein = function(newscript) private$script <- newscript,
