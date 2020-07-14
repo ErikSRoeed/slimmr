@@ -9,9 +9,9 @@ Script <- R6Class("Script",
 
     initialize = function() {},
 
-    inspect = function() {
+    inspect = function(linenumshift = 0) {
       for(nline in 1 : length(private$script)) {
-        cat(nline, paste(rep(" ", nchar(as.character(length(private$script))) - nchar(as.character(nline))), collapse = ""), private$script[nline], fill = TRUE)
+        cat(nline + linenumshift, paste(rep(" ", nchar(as.character(length(private$script))) - nchar(as.character(nline))), collapse = ""), private$script[nline], fill = TRUE)
       }
     },
 
@@ -28,7 +28,7 @@ Script <- R6Class("Script",
     replacetext = function(inlines = NULL, oldtext, newtext, display = FALSE) {
       for(line in if(is.null(inlines)) 1 : length(private$script) else inlines) {
         for(i in 1 : length(oldtext)) {
-          private$script[line] <- gsub(oldtext[i], newtext[i], private$script[line])
+          private$script[line] <- gsub(oldtext[i], newtext[i], private$script[line], fixed = TRUE)
         }
       }
       if (display) self$inspect()

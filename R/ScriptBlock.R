@@ -9,9 +9,10 @@ ScriptBlock <- R6Class("ScriptBlock",
 
   public = list(
 
-    initialize = function(type, prewritten = NULL, ...) {
+    initialize = function(type, index, prewritten = NULL, ...) {
 
       self$type <- type
+      self$index <- index
 
       if (is.null(prewritten)) {
         private$script <- readLines(paste("SLiM/block_", type, ".slim", sep = ""))
@@ -25,10 +26,11 @@ ScriptBlock <- R6Class("ScriptBlock",
     },
 
     writein = function(newscript) private$script <- newscript,
-
     writeout = function() return(private$script),
+    reindex = function(newindex) self$index <- newindex,
 
-    type = c()
+    type = c(),
+    index = 0
 
   )
 
