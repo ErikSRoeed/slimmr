@@ -9,7 +9,7 @@ SlimModel <- R6Class("SlimModel",
 
   public = list(
 
-    initialize = function(description, scriptfile = NULL, type = "WF", mu = 1e-8, rho = 1e-8, sex = "", dimensions = "", periodicity = "") {
+    initialize = function(description, scriptfile = NULL, generations = 1000, type = "WF", mu = 1e-8, rho = 1e-8, sex = NULL, dimensions = NULL, periodicity = NULL) {
       if (!is.null(scriptfile)) {
         copyfile <- paste(gsub(".slim", "", scriptfile), "_slimmr.slim", sep = "")
         writeLines(readLines(scriptfile), copyfile)
@@ -20,14 +20,11 @@ SlimModel <- R6Class("SlimModel",
       } else {
         private$filename <- tempfile("slimmr_", fileext = ".slim")
         private$tmp <- TRUE
-        private$scriptblocks <- append(private$scriptblocks,
-                                       ScriptBlock$new(type = "initialize()", '%typ%' = type, '%dim%' = dimensions,
-                                                       '%per%' = periodicity, '%sex%' = sex, '%mu%' = mu, '%rho%' = rho)
-                                       )
+        self$addblock(blocktype = "initialize", index = 1, type = type, mu = mu, rho = rho, sex = sex, dimensions = dimensions, periodicity = periodicity)
+        self$addblock(blocktype = "event", index = 2, generation = generations, timing = "late", script = "  sim.simulationFinished();")
       }
-      private$script <- private$writefromblocks()
-      writeLines(private$script, private$filename)
       private$description <- description
+      private$updatemodel()
     },
 
     print = function() {
@@ -44,6 +41,24 @@ SlimModel <- R6Class("SlimModel",
       cat("\n\n\n-/ slimmr v 0.1.0 /-------------------------------------------------------")
     },
 
+    setup_genome = function() {},
+
+    setup_population = function() {},
+
+    add_mutationtype = function() {},
+
+    add_interactiontype = function() {},
+
+    addblock = function(index, blocktype, ...) {
+
+      block <- switch(blocktype,
+                      initialize = private$addblock_initialize(index, ...),
+                      event = private$addblock_event(index, ...))
+
+      private$scriptblocks <- append(private$scriptblocks, block)
+      private$updatemodel()
+    },
+
     inspectblock = function(index) {
       if (index > 1) {
         beginatline <- sum(sapply((1 : (index - 1)), function(b) length(private$scriptblocks[[b]]$writeout())))
@@ -56,11 +71,11 @@ SlimModel <- R6Class("SlimModel",
     savetofile = function(path, filename) {
       private$filename <- paste(ifelse(substr(path, nchar(path), nchar(path)) == "/", path, paste(path, "/", sep = "")), filename, ".slim", sep = "")
       private$tmp <- FALSE
-      private$writefile()
+      private$updatemodel()
     },
 
     run = function(...) {
-      private$writefile()
+      private$updatemodel()
       args <- list(...)
       slimargs <- paste(lapply(names(args), function(arg) sprintf("-d %s=%f", arg, args[arg])), collapse = " ")
       syscall <- paste("slim ", slimargs, " ", private$filename, sep = "")
@@ -68,21 +83,18 @@ SlimModel <- R6Class("SlimModel",
     },
 
     addlines = function(add, after) {
-      super$addlines(add, after, display = TRUE)
-      private$updateblocks()
-      private$writefile()
+      super$addlines(add, after, display = FALSE)
+      private$updatemodel(updateblocks = TRUE)
     },
 
     removelines = function(remove) {
-      super$removelines(remove, display = TRUE)
-      private$updateblocks()
-      private$writefile()
+      super$removelines(remove, display = FALSE)
+      private$updatemodel(updateblocks = TRUE)
     },
 
     replacetext = function(inlines = NULL, oldtext, newtext) {
-      super$replacetext(inlines, oldtext, newtext, display = TRUE)
-      private$updateblocks()
-      private$writefile()
+      super$replacetext(inlines, oldtext, newtext, display = FALSE)
+      private$updatemodel(updateblocks = TRUE)
     },
 
     moveblock = function(index, to) {
@@ -95,9 +107,7 @@ SlimModel <- R6Class("SlimModel",
       private$scriptblocks[[index]]$reindex(to)
       for (b in betweens) private$scriptblocks[[b]]$reindex(b + shift)
 
-      private$orderblocks()
-      private$script <- private$writefromblocks()
-      private$writefile()
+      private$updatemodel()
     },
 
     removeblock = function(index) {
@@ -108,13 +118,58 @@ SlimModel <- R6Class("SlimModel",
         for (a in afters) private$scriptblocks[[which(lapply(private$scriptblocks, function(block) block$index) == a)]]$reindex(a - 1)
       }
 
-      private$script <- private$writefromblocks()
-      private$writefile()
+      private$updatemodel()
     }
 
   ),
 
   private = list(
+
+    addblock_initialize = function(index, type = "WF", mu = 1e-8, rho = 1e-8, sex = NULL, dimensions = NULL, periodicity = NULL) {
+      block <- ScriptBlock$new(type = "initialize()", '%1%' = type, '%2%' = dimensions, '%3%' = periodicity, '%4%' = sex, '%5%' = mu, '%6%' = rho,
+                               index = ifelse(index > length(private$scriptblocks) + 1, length(private$scriptblocks) + 1, index))
+
+      if(is.null(sex)) block$removelines(4)
+      if(is.null(dimensions) && is.null(periodicity)) block$removelines(3)
+      if(is.null(periodicity) && !is.null(dimensions)) block$replacetext(inlines = 3, oldtext = ", periodicity = 'NULL", newtext = "")
+
+      return(block)
+    },
+
+    addblock_event = function(index, generation, until = NULL, timing = NULL, script = "  ") {
+
+      until <- ifelse(is.null(until), "", paste(" : ", until, sep = ""))
+      timing <- ifelse(is.null(timing), "", paste(" ", timing, "()", sep = ""))
+
+      block <- ScriptBlock$new(type = "event", '%1%' = generation, '%2%' = until, '%3%' = timing,
+                               index = ifelse(index > length(private$scriptblocks) + 1, length(private$scriptblocks) + 1, index))
+
+      block$type <- paste(generation, " ", until, timing, sep = "")
+      block$addlines(add = script, after = 1)
+
+      return(block)
+    },
+
+    addblock_fitness = function() {},
+
+    addblock_mateChoice = function() {},
+
+    addblock_modifyChild = function() {},
+
+    addblock_recombination = function() {},
+
+    addblock_interaction = function() {},
+
+    addblock_reproduction = function() {},
+
+    addblock_mutation = function() {},
+
+    updatemodel = function(updateblocks = FALSE) {
+      if(updateblocks) private$updateblocks()
+      private$orderblocks()
+      private$script <- private$writefromblocks()
+      private$writefile()
+    },
 
     writefile = function() writeLines(private$script, private$filename),
 
