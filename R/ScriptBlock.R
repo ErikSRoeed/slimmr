@@ -3,6 +3,10 @@
 # This file contains the definition of the ScriptBlock class
 # This file is part of the R package slimmr
 
+#' Class: ScriptBlock
+#'
+#' @description Internal class to hold scriptblocks
+#'
 ScriptBlock <- R6Class("ScriptBlock",
 
   inherit = Script,

@@ -3,6 +3,11 @@
 # This file contains the definition of the SlimModel class
 # This file is part of the R package slimmr
 
+#' Class: SlimModel
+#'
+#' @import R6
+#' @export
+#'
 SlimModel <- R6Class("SlimModel",
 
   inherit = Script,
@@ -144,7 +149,7 @@ SlimModel <- R6Class("SlimModel",
       block <- ScriptBlock$new(type = "event", '%1%' = generation, '%2%' = until, '%3%' = timing,
                                index = ifelse(index > length(private$scriptblocks) + 1, length(private$scriptblocks) + 1, index))
 
-      block$type <- paste(generation, " ", until, timing, sep = "")
+      block$type <- paste(generation, until, timing, sep = "")
       block$addlines(add = script, after = 1)
 
       return(block)

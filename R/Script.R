@@ -3,6 +3,10 @@
 # This file contains the definition of the Script class
 # This file is part of the R package slimmr
 
+#' Class: Script
+#'
+#' @description Internal superclass for models and scriptblocks
+#'
 Script <- R6Class("Script",
 
   public = list(

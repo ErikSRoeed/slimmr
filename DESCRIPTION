@@ -10,4 +10,5 @@ Description: An object-oriented R package for interfacing with SLiM.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.6.0),  R6 (>= 2.4.1)
+Depends: R (>= 3.6.0), R6 (>= 2.4.1)
+RoxygenNote: 7.1.0
