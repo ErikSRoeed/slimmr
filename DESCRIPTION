@@ -3,11 +3,11 @@ Type: Package
 Title: SLiM Models in R
 Version: 0.1.0
 Date: 2020-07-10
-Author: person("Erik Sandertun", "Roeed", email = "e.roeed@uq.net.au", role = c("aut", "cre"))
+Authors@R: person("Erik Sandertun", "Roeed", email = "e.roeed@uq.net.au", role = c("aut", "cre"))
+Author: Erik Sandertun Roeed [aut, cre]
+Maintainer: Erik Sandertun Roeed <e.roeed@uq.net.au>
 Description: An object-oriented R package for interfacing with SLiM.
-License: GNU General Public License V. 3
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends:
-    R (>= 3.6.2)
-    R6 (>= 2.4.1)
+Depends: R (>= 3.6.0),  R6 (>= 2.4.1)
