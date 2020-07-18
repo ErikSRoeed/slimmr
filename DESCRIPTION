@@ -6,7 +6,7 @@ Date: 2020-07-10
 Authors@R: person("Erik Sandertun", "Roeed", email = "e.roeed@uq.net.au", role = c("aut", "cre"))
 Author: Erik Sandertun Roeed [aut, cre]
 Maintainer: Erik Sandertun Roeed <e.roeed@uq.net.au>
-Description: An object-oriented R package for interfacing with SLiM.
+Description: An R package for running and interfacing with SLiM, writing or manipulating SLiM models, and cleaning SLiM output.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
