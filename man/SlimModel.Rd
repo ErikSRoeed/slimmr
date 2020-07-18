@@ -4,9 +4,7 @@
 \alias{SlimModel}
 \title{Class: SlimModel}
 \description{
-Class: SlimModel
-
-Class: SlimModel
+Internal class to generate model objects
 }
 \section{Super class}{
 \code{\link[slimmr:Script]{slimmr::Script}} -> \code{SlimModel}
@@ -46,14 +44,14 @@ Class: SlimModel
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SlimModel$new(
   description,
-  scriptfile = NULL,
-  generations = 1000,
-  type = "WF",
-  mu = 1e-08,
-  rho = 1e-08,
-  sex = NULL,
-  dimensions = NULL,
-  periodicity = NULL
+  scriptfile,
+  generations,
+  type,
+  mu,
+  rho,
+  sex,
+  dimensions,
+  periodicity
 )}\if{html}{\out{</div>}}
 }
 

@@ -5,8 +5,9 @@
 
 #' Class: SlimModel
 #'
+#' @description Internal class to generate model objects
+#'
 #' @import R6
-#' @export
 #'
 SlimModel <- R6Class("SlimModel",
 
@@ -14,7 +15,7 @@ SlimModel <- R6Class("SlimModel",
 
   public = list(
 
-    initialize = function(description, scriptfile = NULL, generations = 1000, type = "WF", mu = 1e-8, rho = 1e-8, sex = NULL, dimensions = NULL, periodicity = NULL) {
+    initialize = function(description, scriptfile, generations, type, mu, rho, sex, dimensions, periodicity) {
       if (!is.null(scriptfile)) {
         copyfile <- paste(gsub(".slim", "", scriptfile), "_slimmr.slim", sep = "")
         writeLines(readLines(scriptfile), copyfile)
