@@ -7,7 +7,7 @@
 #'
 #' @description Internal superclass for models and scriptblocks
 #'
-Script <- R6Class("Script",
+Script <- R6::R6Class("Script",
 
   public = list(
 

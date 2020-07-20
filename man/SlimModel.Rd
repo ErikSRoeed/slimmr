@@ -22,6 +22,7 @@ Internal class to generate model objects
 \item \href{#method-inspectblock}{\code{SlimModel$inspectblock()}}
 \item \href{#method-savetofile}{\code{SlimModel$savetofile()}}
 \item \href{#method-run}{\code{SlimModel$run()}}
+\item \href{#method-runp}{\code{SlimModel$runp()}}
 \item \href{#method-addlines}{\code{SlimModel$addlines()}}
 \item \href{#method-removelines}{\code{SlimModel$removelines()}}
 \item \href{#method-replacetext}{\code{SlimModel$replacetext()}}
@@ -133,7 +134,16 @@ Internal class to generate model objects
 \if{latex}{\out{\hypertarget{method-run}{}}}
 \subsection{Method \code{run()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SlimModel$run(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SlimModel$run(outputfn = "none", ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-runp"></a>}}
+\if{latex}{\out{\hypertarget{method-runp}{}}}
+\subsection{Method \code{runp()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SlimModel$runp(outputfn = "none", outfile = "", replicates = 1, nodes = 1, ...)}\if{html}{\out{</div>}}
 }
 
 }

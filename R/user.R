@@ -1,6 +1,6 @@
 # user.R
 
-# This file contains the user-available functions of slimmr, including generalised generator functions.
+# This file contains the user-available functions of slimmr, including a functionalised SlimModel generator.
 # This file is part of the R package slimmr
 
 #' Function: newSlimModel
@@ -16,6 +16,10 @@
 #' @param periodicity If creating model from scratch, 'NULL' or...
 #'
 #' @description Generate an object of class SlimModel.
+#' @return An object of class SlimModel.
+#'
+#' @import R6
+#' @import parallel
 #'
 #' @export
 #'

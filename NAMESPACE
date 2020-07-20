@@ -2,3 +2,4 @@
 
 export(newSlimModel)
 import(R6)
+import(parallel)

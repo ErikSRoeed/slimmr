@@ -7,7 +7,7 @@
 #'
 #' @description Internal class to hold scriptblocks
 #'
-ScriptBlock <- R6Class("ScriptBlock",
+ScriptBlock <- R6::R6Class("ScriptBlock",
 
   inherit = Script,
 

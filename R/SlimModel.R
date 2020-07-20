@@ -7,9 +7,7 @@
 #'
 #' @description Internal class to generate model objects
 #'
-#' @import R6
-#'
-SlimModel <- R6Class("SlimModel",
+SlimModel <- R6::R6Class("SlimModel",
 
   inherit = Script,
 
@@ -65,6 +63,16 @@ SlimModel <- R6Class("SlimModel",
       private$updatemodel()
     },
 
+    rescheduleblock = function(index, time, totime) {
+      # Reschedule an event block to a differen time by index, OR ...
+      # ... reschedule all event blocks for a given time to another time
+    },
+
+    rescopeblock = function(index, toscope) {
+      # Rescope a callback block to a different scope, for instance ...
+      # ... change mutation(m2) {} to mutation(m3) {}.
+    },
+
     inspectblock = function(index) {
       if (index > 1) {
         beginatline <- sum(sapply((1 : (index - 1)), function(b) length(private$scriptblocks[[b]]$writeout())))
@@ -80,12 +88,42 @@ SlimModel <- R6Class("SlimModel",
       private$updatemodel()
     },
 
-    run = function(...) {
+    run = function(outputfn = "none", ...) {
       private$updatemodel()
+
+      # Console output for parallel computing
+      if(!is.null(list(...)[['repecho']]) & (list(...)[['repecho']] %% list(...)[['repechointerval']] == 0 | list(...)[['repecho']] == 1)) {
+        cat(paste(Sys.time(), ">>> Currently simulating... Model:", private$description, "| Replicate:", list(...)[['repecho']], "\n"))
+      }
+
       args <- list(...)
       slimargs <- paste(lapply(names(args), function(arg) sprintf("-d %s=%f", arg, args[arg])), collapse = " ")
       syscall <- paste("slim ", slimargs, " ", private$filename, sep = "")
-      return(system(syscall, intern = TRUE))
+      slimoutput <- system(syscall, intern = TRUE)
+
+      outputlinecount <- length(slimoutput) - which(slimoutput == "// Starting run at generation <start>:") - 3
+      switch (outputfn,
+        none = slimresults <- slimoutput[(length(slimoutput) - outputlinecount) : length(slimoutput)]
+      )
+      slimresults <- append(list(output = slimresults), list(seed = as.character(slimoutput[2])), 0)
+
+      return(slimresults)
+    },
+
+    runp = function(outputfn = "none", outfile, replicates = 1, nodes = 1, feedbackinterval = 1, ...) {
+      selfclone <- self$clone(deep = TRUE)
+
+      cat(paste(Sys.time(), ">>> Cloning self to", nodes, "workers...", "\n"))
+
+      clust <- parallel::makeCluster(nodes, outfile = "")
+      parallel::clusterExport(cl = clust, varlist = c('selfclone'), envir = environment())
+      output <- parallel::clusterApply(cl = clust, x = seq(1, replicates, 1),
+                                       fun = function(rep) selfclone$run(outputfn = outputfn, repecho = rep, repechointerval = feedbackinterval, ...)
+                                       )
+      writeLines(unlist(lapply((1 : length(output)), function(rep) c(paste(">>> Seed:", as.character(output[[rep]]$seed)), output[[rep]]$output))), outfile)
+      stopCluster(cl = clust)
+
+      cat(paste(Sys.time(), ">>> All simulations finished, results output to", outfile, "\n"))
     },
 
     addlines = function(add, after) {

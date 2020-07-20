@@ -1,5 +1,5 @@
 # slimmr: SLiM Models in R
-An object-oriented R package for interfacing with SLiM.
+An R package for running and interfacing with SLiM, writing or manipulating SLiM models, and processing SLiM output.
 
 ## Example
 
