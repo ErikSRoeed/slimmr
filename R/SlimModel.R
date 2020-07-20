@@ -110,7 +110,7 @@ SlimModel <- R6::R6Class("SlimModel",
       return(slimresults)
     },
 
-    runp = function(outputfn = "none", outfile, replicates = 1, nodes = 1, feedbackinterval = 1, ...) {
+    runp = function(outputfn = "none", outfile = "", replicates = 1, nodes = 1, feedbackinterval = 1, ...) {
       selfclone <- self$clone(deep = TRUE)
 
       cat(paste(Sys.time(), ">>> Cloning self to", nodes, "workers...", "\n"))
@@ -118,12 +118,17 @@ SlimModel <- R6::R6Class("SlimModel",
       clust <- parallel::makeCluster(nodes, outfile = "")
       parallel::clusterExport(cl = clust, varlist = c('selfclone'), envir = environment())
       output <- parallel::clusterApply(cl = clust, x = seq(1, replicates, 1),
-                                       fun = function(rep) selfclone$run(outputfn = outputfn, repecho = rep, repechointerval = feedbackinterval, ...)
-                                       )
-      writeLines(unlist(lapply((1 : length(output)), function(rep) c(paste(">>> Seed:", as.character(output[[rep]]$seed)), output[[rep]]$output))), outfile)
+                                       fun = function(rep) selfclone$run(outputfn = outputfn, repecho = rep, repechointerval = feedbackinterval, ...))
       stopCluster(cl = clust)
 
-      cat(paste(Sys.time(), ">>> All simulations finished, results output to", outfile, "\n"))
+      if(outfile == "") {
+        cat(paste(Sys.time(), ">>> All simulations finished, no outfile provided. Returning results. \n"))
+        return(output)
+      } else {
+        save(output, file = paste(outfile, ".Rdata", sep = ""))
+        cat(paste(Sys.time(), ">>> All simulations finished, results saved to", outfile, ".Rdata.\n"))
+        return()
+      }
     },
 
     addlines = function(add, after) {
