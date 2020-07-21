@@ -45,13 +45,13 @@ SlimModel <- R6::R6Class("SlimModel",
       cat("\n\n\n-/ slimmr v 0.1.0 /-------------------------------------------------------")
     },
 
-    setup_genome = function() {},
+    setup_genome = function() warning("Method not yet implemented..."),
 
-    setup_population = function() {},
+    setup_population = function() warning("Method not yet implemented..."),
 
-    add_mutationtype = function() {},
+    add_mutationtype = function() warning("Method not yet implemented..."),
 
-    add_interactiontype = function() {},
+    add_interactiontype = function() warning("Method not yet implemented..."),
 
     addblock = function(index, blocktype, ...) {
 
@@ -63,9 +63,30 @@ SlimModel <- R6::R6Class("SlimModel",
       private$updatemodel()
     },
 
-    rescheduleblock = function(index, time, totime) {
-      # Reschedule an event block to a differen time by index, OR ...
-      # ... reschedule all event blocks for a given time to another time
+    rescheduleblocks = function(indices, totime, timing = NULL) {
+
+      for(t in timing) {
+        if(!(t %in% c("early()", "late()", ""))) {
+          warning("Non-supported timing argument supplied - not changing timings.")
+          timing <- NULL
+        }
+      }
+
+      for(index in indices) {
+        block <- private$scriptblocks[[index]]
+        oldtype <- block$type
+
+        if(is.na(as.integer(substr(oldtype, 1, 1)))) {
+          warning("slimmr: Cannot reschedule non-timed callback.")
+          next
+        }
+
+        cutoff <- tail(gregexpr(" ", oldtype, fixed = TRUE)[[1]], 1)
+        repl <- substr(oldtype, 1, (ifelse(cutoff == -1, nchar(oldtype), ifelse(is.null(timing), cutoff - 1, nchar(oldtype)))))
+        block$type <- sub(repl, as.character(ifelse(is.null(timing), totime, paste(totime, timing[which(indices == index)]))), oldtype, fixed = TRUE)
+        block$replacetext(inlines = 1, oldtext = oldtype, newtext = block$type)
+        private$updatemodel()
+      }
     },
 
     rescopeblock = function(index, toscope) {
@@ -91,7 +112,7 @@ SlimModel <- R6::R6Class("SlimModel",
     run = function(outputfn = "none", ...) {
       private$updatemodel()
 
-      # Console output for parallel computing
+      # Console output for parallel computing (Fix bug!)
       if(!is.null(list(...)[['repecho']]) & (list(...)[['repecho']] %% list(...)[['repechointerval']] == 0 | list(...)[['repecho']] == 1)) {
         cat(paste(Sys.time(), ">>> Currently simulating... Model:", private$description, "| Replicate:", list(...)[['repecho']], "\n"))
       }
@@ -199,19 +220,19 @@ SlimModel <- R6::R6Class("SlimModel",
       return(block)
     },
 
-    addblock_fitness = function() {},
+    addblock_fitness = function() warning("Method not yet implemented..."),
 
-    addblock_mateChoice = function() {},
+    addblock_mateChoice = function() warning("Method not yet implemented..."),
 
-    addblock_modifyChild = function() {},
+    addblock_modifyChild = function() warning("Method not yet implemented..."),
 
-    addblock_recombination = function() {},
+    addblock_recombination = function() warning("Method not yet implemented..."),
 
-    addblock_interaction = function() {},
+    addblock_interaction = function() warning("Method not yet implemented..."),
 
-    addblock_reproduction = function() {},
+    addblock_reproduction = function() warning("Method not yet implemented..."),
 
-    addblock_mutation = function() {},
+    addblock_mutation = function() warning("Method not yet implemented..."),
 
     updatemodel = function(updateblocks = FALSE) {
       if(updateblocks) private$updateblocks()
