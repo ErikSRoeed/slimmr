@@ -77,7 +77,7 @@ SlimModel <- R6::R6Class("SlimModel",
         oldtype <- block$type
 
         if(is.na(as.integer(substr(oldtype, 1, 1)))) {
-          warning("slimmr: Cannot reschedule non-timed callback.")
+          warning("Cannot reschedule non-timed callback.")
           next
         }
 
@@ -90,8 +90,19 @@ SlimModel <- R6::R6Class("SlimModel",
     },
 
     rescopeblock = function(index, toscope) {
-      # Rescope a callback block to a different scope, for instance ...
-      # ... change mutation(m2) {} to mutation(m3) {}.
+      block <- private$scriptblocks[[index]]
+      oldtype <- block$type
+      oldscope <- substr(oldtype, head(gregexpr("(", oldtype, fixed = TRUE), 1), tail(gregexpr(")", oldtype, fixed = TRUE), 1))
+
+      if(oldscope == "") {
+        return(warning("Selected block does not support a scope."))
+      }
+
+      newscope <- paste("(", toscope, ")", sep = "")
+      newtype <- sub(oldscope, newscope, oldtype, fixed = TRUE)
+      block$type <- newtype
+      block$replacetext(inlines = 1, oldtext = oldtype, newtext = newtype)
+      private$updatemodel()
     },
 
     inspectblock = function(index) {
@@ -112,7 +123,7 @@ SlimModel <- R6::R6Class("SlimModel",
     run = function(outputfn = "none", ...) {
       private$updatemodel()
 
-      # Console output for parallel computing (Fix bug!)
+      # Console output for parallel computing
       if(!is.null(list(...)[['repecho']])) {
         if(list(...)[['repecho']] %% list(...)[['repechointerval']] == 0 | list(...)[['repecho']] == 1) {
           cat(paste(Sys.time(), ">>> Currently simulating... Model:", private$description, "| Replicate:", list(...)[['repecho']], "\n"))
