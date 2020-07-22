@@ -19,6 +19,8 @@ Internal class to generate model objects
 \item \href{#method-add_mutationtype}{\code{SlimModel$add_mutationtype()}}
 \item \href{#method-add_interactiontype}{\code{SlimModel$add_interactiontype()}}
 \item \href{#method-addblock}{\code{SlimModel$addblock()}}
+\item \href{#method-rescheduleblocks}{\code{SlimModel$rescheduleblocks()}}
+\item \href{#method-rescopeblock}{\code{SlimModel$rescopeblock()}}
 \item \href{#method-inspectblock}{\code{SlimModel$inspectblock()}}
 \item \href{#method-savetofile}{\code{SlimModel$savetofile()}}
 \item \href{#method-run}{\code{SlimModel$run()}}
@@ -112,6 +114,24 @@ Internal class to generate model objects
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-rescheduleblocks"></a>}}
+\if{latex}{\out{\hypertarget{method-rescheduleblocks}{}}}
+\subsection{Method \code{rescheduleblocks()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SlimModel$rescheduleblocks(indices, totime, timing = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-rescopeblock"></a>}}
+\if{latex}{\out{\hypertarget{method-rescopeblock}{}}}
+\subsection{Method \code{rescopeblock()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SlimModel$rescopeblock(index, toscope)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-inspectblock"></a>}}
 \if{latex}{\out{\hypertarget{method-inspectblock}{}}}
 \subsection{Method \code{inspectblock()}}{
@@ -143,7 +163,14 @@ Internal class to generate model objects
 \if{latex}{\out{\hypertarget{method-runp}{}}}
 \subsection{Method \code{runp()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SlimModel$runp(outputfn = "none", outfile = "", replicates = 1, nodes = 1, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SlimModel$runp(
+  outputfn = "none",
+  outfile = "",
+  replicates = 1,
+  nodes = 1,
+  feedbackinterval = 1,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 }

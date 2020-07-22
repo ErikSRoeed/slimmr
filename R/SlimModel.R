@@ -42,7 +42,7 @@ SlimModel <- R6::R6Class("SlimModel",
         firstb <- FALSE
       }
       cat("\n", ifelse(private$tmp, "Temporary file: ", "File: "), private$filename)
-      cat("\n\n\n-/ slimmr v 0.1.0 /-------------------------------------------------------")
+      cat("\n\n\n-/ slimmr v 0.2.0 /-------------------------------------------------------")
     },
 
     setup_genome = function() warning("Method not yet implemented..."),

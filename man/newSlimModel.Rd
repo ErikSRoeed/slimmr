@@ -35,6 +35,9 @@ newSlimModel(
 
 \item{periodicity}{If creating model from scratch, 'NULL' or...}
 }
+\value{
+An object of class SlimModel.
+}
 \description{
 Generate an object of class SlimModel.
 }

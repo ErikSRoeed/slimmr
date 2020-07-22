@@ -1,7 +1,7 @@
 Package: slimmr
 Type: Package
 Title: SLiM Models in R
-Version: 0.1.0
+Version: 0.2.0
 Date: 2020-07-10
 Authors@R: person("Erik Sandertun", "Roeed", email = "e.roeed@uq.net.au", role = c("aut", "cre"))
 Author: Erik Sandertun Roeed [aut, cre]
