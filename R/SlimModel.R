@@ -132,7 +132,7 @@ SlimModel <- R6::R6Class("SlimModel",
 
       args <- list(...)
       slimargs <- paste(lapply(names(args), function(arg) sprintf("-d %s=%f", arg, args[arg])), collapse = " ")
-      syscall <- paste("slim ", slimargs, " ", private$filename, sep = "")
+      syscall <- paste("slim ", slimargs, " '", private$filename, "'", sep = "")
       slimoutput <- system(syscall, intern = TRUE)
 
       outputlinecount <- length(slimoutput) - which(slimoutput == "// Starting run at generation <start>:") - 3
