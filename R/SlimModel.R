@@ -287,7 +287,7 @@ SlimModel <- R6::R6Class("SlimModel",
 
         if(suppressWarnings(is.na(as.integer(strsplit(header, "", fixed = TRUE)[[1]][1])))) {
           if(substr(header, 1, 8) == "function") {
-            type <- substr(header, regexpr("(", header, fixed = TRUE)[1], tail(gregexpr(")", func, fixed = TRUE)[[1]], 1))
+            type <- substr(header, regexpr("(", header, fixed = TRUE)[1], tail(gregexpr(")", header, fixed = TRUE)[[1]], 1))
           } else {
             type <- trimws(sub("{", "", header, fixed = TRUE))
           }
