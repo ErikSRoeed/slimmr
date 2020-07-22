@@ -113,8 +113,10 @@ SlimModel <- R6::R6Class("SlimModel",
       private$updatemodel()
 
       # Console output for parallel computing (Fix bug!)
-      if(!is.null(list(...)[['repecho']]) & (list(...)[['repecho']] %% list(...)[['repechointerval']] == 0 | list(...)[['repecho']] == 1)) {
-        cat(paste(Sys.time(), ">>> Currently simulating... Model:", private$description, "| Replicate:", list(...)[['repecho']], "\n"))
+      if(!is.null(list(...)[['repecho']])) {
+        if(list(...)[['repecho']] %% list(...)[['repechointerval']] == 0 | list(...)[['repecho']] == 1) {
+          cat(paste(Sys.time(), ">>> Currently simulating... Model:", private$description, "| Replicate:", list(...)[['repecho']], "\n"))
+        }
       }
 
       args <- list(...)
