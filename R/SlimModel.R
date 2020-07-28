@@ -54,12 +54,16 @@ SlimModel <- R6::R6Class("SlimModel",
     add_interactiontype = function() warning("Method not yet implemented..."),
 
     addblock = function(index, blocktype, ...) {
+      targetindex <- index
+      if(length(private$scriptblocks) >= targetindex) index <- length(private$scriptblocks) + 1
 
       block <- switch(blocktype,
                       initialize = private$addblock_initialize(index, ...),
                       event = private$addblock_event(index, ...))
 
       private$scriptblocks <- append(private$scriptblocks, block)
+      private$updatemodel()
+      if(index != targetindex) self$moveblock(index = index, to = targetindex)
       private$updatemodel()
     },
 
@@ -139,7 +143,7 @@ SlimModel <- R6::R6Class("SlimModel",
       switch (outputfn,
         none = slimresults <- slimoutput[(length(slimoutput) - outputlinecount) : length(slimoutput)]
       )
-      slimresults <- append(list(output = slimresults), list(seed = as.character(slimoutput[2])), 0)
+      slimresults <- append(list(output = slimresults), list(seed = as.character(slimoutput[2]), model = as.character(private$script)), 0)
 
       return(slimresults)
     },
@@ -161,7 +165,6 @@ SlimModel <- R6::R6Class("SlimModel",
       } else {
         save(output, file = paste(outfile, ".Rdata", sep = ""))
         cat(paste(Sys.time(), ">>> All simulations finished, results saved to", outfile, ".Rdata.\n"))
-        return()
       }
     },
 
