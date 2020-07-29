@@ -154,7 +154,7 @@ SlimModel <- R6::R6Class("SlimModel",
       cat(paste(Sys.time(), ">>> Cloning self to", nodes, "workers...", "\n"))
 
       clust <- parallel::makeCluster(nodes, outfile = "")
-      parallel::clusterExport(cl = clust, varlist = c('selfclone'), envir = environment())
+      parallel::clusterExport(cl = clust, varlist = c('selfclone', 'outputfn', 'feedbackinterval', names(list(...))), envir = environment())
       output <- parallel::clusterApply(cl = clust, x = seq(1, replicates, 1),
                                        fun = function(rep) selfclone$run(outputfn = outputfn, repecho = rep, repechointerval = feedbackinterval, ...))
       stopCluster(cl = clust)
