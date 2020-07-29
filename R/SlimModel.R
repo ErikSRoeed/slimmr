@@ -124,7 +124,7 @@ SlimModel <- R6::R6Class("SlimModel",
       private$updatemodel()
     },
 
-    run = function(outputfn = "none", ...) {
+    run = function(outputfn = NULL, ...) {
       private$updatemodel()
 
       # Console output for parallel computing
@@ -140,15 +140,17 @@ SlimModel <- R6::R6Class("SlimModel",
       slimoutput <- system(syscall, intern = TRUE)
 
       outputlinecount <- length(slimoutput) - which(slimoutput == "// Starting run at generation <start>:") - 3
-      switch (outputfn,
-        none = slimresults <- slimoutput[(length(slimoutput) - outputlinecount) : length(slimoutput)]
-      )
-      slimresults <- append(list(output = slimresults), list(seed = as.character(slimoutput[2]), model = as.character(private$script)), 0)
+      if(is.null(outputfn)) {
+        slimresults <- slimoutput[(length(slimoutput) - outputlinecount) : length(slimoutput)]
+      } else {
+        slimresults <- outputfn(slimoutput[(length(slimoutput) - outputlinecount) : length(slimoutput)])
+      }
+      slimresults <- append(list(output = slimresults), list(seed = as.character(slimoutput[2])), 0)
 
       return(slimresults)
     },
 
-    runp = function(outputfn = "none", outfile = "", replicates = 1, nodes = 1, feedbackinterval = 1, ...) {
+    replicate = function(outputfn = NULL, outfile = "", replicates = 1, nodes = 1, feedbackinterval = 1, ...) {
       selfclone <- self$clone(deep = TRUE)
 
       cat(paste(Sys.time(), ">>> Cloning self to", nodes, "workers...", "\n"))
@@ -158,6 +160,8 @@ SlimModel <- R6::R6Class("SlimModel",
       output <- parallel::clusterApply(cl = clust, x = seq(1, replicates, 1),
                                        fun = function(rep) selfclone$run(outputfn = outputfn, repecho = rep, repechointerval = feedbackinterval, ...))
       stopCluster(cl = clust)
+
+      output <- append(output, list(model = as.character(private$script)), 0)
 
       if(outfile == "") {
         cat(paste(Sys.time(), ">>> All simulations finished, no outfile provided. Returning results. \n"))
