@@ -130,7 +130,7 @@ SlimModel <- R6::R6Class("SlimModel",
       # Console output for parallel computing
       if(!is.null(list(...)[['repecho']])) {
         if(list(...)[['repecho']] %% list(...)[['repechointerval']] == 0 | list(...)[['repecho']] == 1) {
-          cat(paste(Sys.time(), ">>> Currently simulating... Model:", private$description, "| Replicate:", list(...)[['repecho']], "\n"))
+          cat(paste(Sys.time(), ">>> [", list(...)[['repecho']],"] | Simulating", private$description, "\n"))
         }
       }
 
@@ -151,11 +151,14 @@ SlimModel <- R6::R6Class("SlimModel",
     },
 
     replicate = function(outputfn = NULL, outfile = "", replicates = 1, nodes = 1, feedbackinterval = 1, ...) {
+      cat(paste(Sys.time(), ">>> Parameters: \n"))
+      for(arg in names(list(...))) cat(sprintf("%s = %s\n", arg, list(...)[[arg]]))
+      cat("\n")
+
       selfclone <- self$clone(deep = TRUE)
-
       cat(paste(Sys.time(), ">>> Cloning self to", nodes, "workers...", "\n"))
-
       clust <- parallel::makeCluster(nodes, outfile = "")
+      cat("\n")
       parallel::clusterExport(cl = clust, varlist = c('selfclone', 'outputfn', 'feedbackinterval', names(list(...))), envir = environment())
       output <- parallel::clusterApply(cl = clust, x = seq(1, replicates, 1),
                                        fun = function(rep) selfclone$run(outputfn = outputfn, repecho = rep, repechointerval = feedbackinterval, ...))
@@ -163,6 +166,7 @@ SlimModel <- R6::R6Class("SlimModel",
 
       output <- append(output, list(model = as.character(private$script)), 0)
 
+      cat("\n")
       if(outfile == "") {
         cat(paste(Sys.time(), ">>> All simulations finished, no outfile provided. Returning results. \n"))
         return(output)
