@@ -10,5 +10,5 @@ Description: An R package for running and interfacing with SLiM, writing and man
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.6.2), R6 (>= 2.4.1), parallel (>= 3.6.2)
+Depends: R (>= 3.6.0), R6 (>= 2.4.1), parallel (>= 3.6.2)
 RoxygenNote: 7.1.0

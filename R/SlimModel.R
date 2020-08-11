@@ -220,7 +220,7 @@ SlimModel <- R6::R6Class("SlimModel",
   private = list(
 
     addblock_initialize = function(index, type = "WF", mu = 1e-8, rho = 1e-8, sex = NULL, dimensions = NULL, periodicity = NULL) {
-      block <- ScriptBlock$new(type = "initialize()", '%1%' = type, '%2%' = dimensions, '%3%' = periodicity, '%4%' = sex, '%5%' = mu, '%6%' = rho,
+      block <- ScriptBlock$new(type = "initialize", '%1%' = type, '%2%' = dimensions, '%3%' = periodicity, '%4%' = sex, '%5%' = mu, '%6%' = rho,
                                index = ifelse(index > length(private$scriptblocks) + 1, length(private$scriptblocks) + 1, index))
 
       if(is.null(sex)) block$removelines(4)

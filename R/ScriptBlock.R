@@ -1,4 +1,4 @@
-# ScriptBLock.R
+# ScriptBlock.R
 
 # This file contains the definition of the ScriptBlock class
 # This file is part of the R package slimmr
@@ -19,7 +19,7 @@ ScriptBlock <- R6::R6Class("ScriptBlock",
       self$index <- index
 
       if (is.null(prewritten)) {
-        private$script <- readLines(paste("SLiM/block_", type, ".slim", sep = ""))
+        private$script <- slimcode(type = paste("block_", type, sep = ""))
         arg = list(...)
         argnames = names(arg)
         self$replacetext(NULL, as.character(argnames), as.character(arg), display = FALSE)
