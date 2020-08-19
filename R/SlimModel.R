@@ -127,17 +127,10 @@ SlimModel <- R6::R6Class("SlimModel",
     run = function(outputfn = NULL, ...) {
       private$updatemodel()
 
-      # Console output for parallel computing
-      if(!is.null(list(...)[['repecho']])) {
-        if(list(...)[['repecho']] %% list(...)[['repechointerval']] == 0 | list(...)[['repecho']] == 1) {
-          cat(paste(Sys.time(), ">>> [", list(...)[['repecho']],"] | Simulating", private$description, "\n"))
-        }
-      }
-
       args <- list(...)
       slimargs <- paste(lapply(names(args), function(arg) sprintf("-d %s=%f", arg, args[arg])), collapse = " ")
       syscall <- paste("slim ", slimargs, " '", private$filename, "'", sep = "")
-      slimoutput <- system(syscall, intern = TRUE)
+      slimoutput <- system(syscall, intern = TRUE, ignore.stderr = TRUE)
 
       outputlinecount <- length(slimoutput) - which(slimoutput == "// Starting run at generation <start>:") - 3
       if(is.null(outputfn)) {
@@ -154,18 +147,36 @@ SlimModel <- R6::R6Class("SlimModel",
       cat(paste(Sys.time(), ">>> Parameters: \n"))
       for(arg in names(list(...))) cat(sprintf("%s = %s\n", arg, list(...)[[arg]]))
       cat("\n")
-
-      selfclone <- self$clone(deep = TRUE)
       cat(paste(Sys.time(), ">>> Cloning self to", nodes, "workers...", "\n"))
       clust <- parallel::makeCluster(nodes, outfile = "")
       cat("\n")
-      exportlist <- c(list(selfclone = selfclone, outputfn = outputfn, feedbackinterval = feedbackinterval), list(...))
-      parallel::clusterExport(cl = clust, varlist = c('selfclone', 'outputfn', 'feedbackinterval', names(list(...))), envir = list2env(exportlist))
-      output <- parallel::clusterApply(cl = clust, x = seq(1, replicates, 1),
-                                       fun = function(rep) selfclone$run(outputfn = outputfn, repecho = rep, repechointerval = feedbackinterval, ...))
-      stopCluster(cl = clust)
 
+      selfclone <- self$clone(deep = TRUE)
+      exportlist <- c(list(selfclone = selfclone, outputfn = outputfn, feedbackinterval = feedbackinterval), list(...))
+      parallel::clusterExport(cl = clust, varlist = c('selfclone', 'outputfn', names(list(...))), envir = list2env(exportlist))
+
+      output <- parallel::clusterApplyLB(cl = clust, x = seq(1, replicates, 1), fun = function(rep)
+        {
+          out <- tryCatch(
+            # Try simulation
+            {
+              if(rep %% feedbackinterval == 0 | rep == 1) {
+                cat(paste(Sys.time(), ">>> [", rep ,"] | Simulating", private$description, "\n"))
+              }
+              selfclone$run(outputfn = outputfn, repecho = rep, ...)
+            },
+            # Catch warning if simulation fails in SLiM
+            warning = function(cond) {
+              cat(paste(Sys.time(), " >>> [ ", rep, " ] | ERROR: Simulation failed at worker. Skipping replicate.\n", sep = ""))
+              return("REPLICATE FAILED")
+            }
+          )
+          return(out)
+        }
+      )
       output <- append(output, list(model = as.character(private$script)), 0)
+
+      stopCluster(cl = clust)
 
       cat("\n")
       if(outfile == "") {
