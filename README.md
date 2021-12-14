@@ -1,12 +1,10 @@
 # slimmr: SLiM Models in R
-An R package for running and interfacing with SLiM, writing or manipulating SLiM models, and processing SLiM output.
+
+## Development of slimmr is discontinued
+slimmr is currently not in development. A future end-of-life update may tidy up the code.
 
 ## Third-party software requirements
 slimmr requires a working installation of SLiM3, which can be downloaded from: https://messerlab.org/slim/. NOTE: the contributor(s) to this package have no affiliation with, and are not endorsed by, the developers of SLiM. Please cite the developers of SLiM as per their preference if you find this package useful, in addition to citing slimmr.
-
-## slimmr is a work in progress
-slimmr is currently in development; the features of slimmr are at this point neither complete, nor guaranteed bug-free. Many planned features are not
-yet available, and may not be in the near future.
 
 ## Example
 ```r
