@@ -12,7 +12,6 @@
 parse_script <- function(script_path, drop_empty_lines = TRUE)
 {
   stopifnot(file.exists(script_path))
-  stopifnot(file.)
   script <- readLines(script_path)
 
   if (drop_empty_lines)
