@@ -17,8 +17,6 @@ EidosBlock <- R6::R6Class(
       {
         self$add_line(line)
       }
-
-      self$set_callback()
     },
 
     add_line = function(line, after_line_number = length(self$lines))
@@ -40,23 +38,10 @@ EidosBlock <- R6::R6Class(
       }
     },
 
-    set_callback = function(overwrite_existing = NULL)
+    change_callback = function(new_callback)
     {
-      CALLBACK_LINE_INDEX <- 1
-      READ_CALLBACK_FROM_LINE <- is.null(overwrite_existing)
-
-      if (READ_CALLBACK_FROM_LINE)
-      {
-        current_callback <- self$lines[[CALLBACK_LINE_INDEX]]$callback
-        private$callback_private <- current_callback
-        return()
-      }
-
-      private$lines_private[[CALLBACK_LINE_INDEX]]$substitute_phrase(
-        phrase = private$callback_private,
-        substitute = new_callback
-      )
-      self$set_callback()
+      FIRST_LINE <- 1
+      self$substitute_phrase_in_lines(FIRST_LINE, self$callback, new_callback)
     }
 
   ),
@@ -65,7 +50,9 @@ EidosBlock <- R6::R6Class(
 
     callback = function()
     {
-      return(private$callback_private)
+      FIRST_LINE <- 1
+      callback <- self$lines[[FIRST_LINE]]$callback
+      return(callback)
     },
 
     lines = function()
@@ -77,7 +64,6 @@ EidosBlock <- R6::R6Class(
 
   private = list(
 
-    callback_private = "",
     lines_private = list()
 
   )
