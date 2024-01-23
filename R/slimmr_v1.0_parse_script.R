@@ -12,13 +12,13 @@
 parse_script <- function(script_path, drop_empty_lines = TRUE)
 {
   stopifnot(file.exists(script_path))
-  script <- readLines(script_path)
+  script_lines <- readLines(script_path)
 
   if (drop_empty_lines)
   {
-    empty_lines <- which(script == "")
-    script <- script[-empty_lines]
+    empty_lines <- which(script_lines == "")
+    script_lines <- script_lines[-empty_lines]
   }
 
-  return(script)
+  return(script_lines)
 }

@@ -11,36 +11,25 @@ EidosLine <- R6::R6Class(
 
   public = list(
 
-    initialize = function(string, number)
+    initialize = function(eidos_string)
     {
-      self$overwrite_string(new_string = string)
-      self$increment_number(by = number)
+      self$overwrite(new_string = eidos_string)
     },
 
-    overwrite_string = function(new_string)
+    overwrite = function(new_string)
     {
       private$string_private <- new_string
-    },
-
-    increment_number = function(by)
-    {
-      private$number_private <- self$number + by
     },
 
     substitute_phrase = function(phrase, substitute)
     {
       with_substitutions <- gsub(phrase, substitute, self$string)
-      self$overwrite_string(new_string = with_substitutions)
+      self$overwrite(new_string = with_substitutions)
     }
 
   ),
 
   active = list(
-
-    number = function()
-    {
-      return(private$number_private)
-    },
 
     string = function()
     {
@@ -84,16 +73,14 @@ EidosLine <- R6::R6Class(
         return(NULL)
       }
 
-      string_without_bracket <- gsub(REGEX_OPENING_BRACKET, BLANK, self$string)
-      callback_string <- trimws(string_without_bracket)
-      return(callback_string)
+      callback <- gsub(REGEX_OPENING_BRACKET, BLANK, self$string) |> trimws()
+      return(callback)
     }
 
   ),
 
   private = list(
 
-    number_private = 0,
     string_private = ""
 
   )

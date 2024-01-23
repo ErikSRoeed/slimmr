@@ -11,45 +11,28 @@ EidosBlock <- R6::R6Class(
 
   public = list(
 
-    initialize = function(index, lines)
+    initialize = function(eidos_lines)
     {
-      for(line in lines)
+      for(line in eidos_lines)
       {
-        self$add_line(line, after_line_number = line$number - 1)
+        self$add_line(line)
       }
 
-      self$set_index(to = index)
       self$set_callback()
     },
 
-    add_line = function(line, after_line_number)
+    add_line = function(line, after_line_number = length(self$lines))
     {
       private$lines_private <- append(
         x = self$lines,
         value = line,
         after = after_line_number
       )
-
-      added_line_number <- after_line_number + 1
-      self$increment_line_numbers(after_line = added_line_number, by = 1)
     },
 
     remove_line = function(line_number)
     {
       private$lines_private <- private$lines_private[-line_number]
-      self$increment_line_numbers(after_line = line_number, by = -1)
-    },
-
-    increment_line_numbers = function(after_line, by)
-    {
-      for (line in private$lines_private)
-      {
-        if (line$number <= after_line)
-        {
-          next
-        }
-        line$increment_number(by = by)
-      }
     },
 
     substitute_phrase = function(phrase, substitute)
@@ -77,11 +60,6 @@ EidosBlock <- R6::R6Class(
         substitute = new_callback
       )
       self$set_callback()
-    },
-
-    set_index = function(to)
-    {
-      private$index_private <- to
     }
 
   ),
@@ -91,11 +69,6 @@ EidosBlock <- R6::R6Class(
     callback = function()
     {
       return(private$callback_private)
-    },
-
-    index = function()
-    {
-      return(private$index_private)
     },
 
     lines = function()
@@ -108,7 +81,6 @@ EidosBlock <- R6::R6Class(
   private = list(
 
     callback_private = "",
-    index_private = 0,
     lines_private = list()
 
   )

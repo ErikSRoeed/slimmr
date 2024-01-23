@@ -11,34 +11,28 @@
 #'
 convert_to_eidos_blocks <- function(eidos_lines)
 {
-  inputs_are_eidos_lines <- sapply(
-    eidos_lines,
-    function(line) "EidosLine" %in% class(line)
-  )
-  stopifnot(all(inputs_are_eidos_lines))
   stopifnot(is.list(eidos_lines))
 
-  last_line_number <- 0
-  last_block_index <- 0
+  test_if_eidos_line <- function(object) "EidosLine" %in% class(object)
+  inputs_are_valid <- sapply(eidos_lines, test_if_eidos_line)
+
+  stopifnot(all(inputs_are_valid))
+
   blocks <- list()
 
   for (line in eidos_lines)
   {
-    line_is_new_block_callback <- ! is.null(line$callback)
+    last_block_number <- length(blocks)
+    line_is_callback_of_new_block <- ! is.null(line$callback)
 
-    if (line_is_new_block_callback)
+    if (line_is_callback_of_new_block)
     {
-      new_block_index <- last_block_index + 1
-      new_block <- EidosBlock$new(index = new_block_index, lines = list(line))
-      blocks <- append(blocks, new_block)
-      last_block_index <- new_block_index
-    }
-    else
-    {
-      blocks[[last_block_index]]$add_line(line, after_line_number = last_line_number)
+      new_block_number <- last_block_number + 1
+      blocks[[new_block_number]] <- EidosBlock$new(eidos_lines = list(line))
+      next
     }
 
-    last_line_number <- line$number
+    blocks[[last_block_number]]$add_line(line)
   }
 
   return(blocks)
