@@ -23,7 +23,7 @@ EidosLine <- R6::R6Class(
 
     substitute_phrase = function(phrase, substitute)
     {
-      with_substitutions <- gsub(phrase, substitute, self$string)
+      with_substitutions <- gsub(phrase, substitute, self$string, fixed = TRUE)
       self$overwrite(new_string = with_substitutions)
     }
 

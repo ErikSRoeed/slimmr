@@ -23,11 +23,8 @@ EidosBlock <- R6::R6Class(
 
     add_line = function(line, after_line_number = length(self$lines))
     {
-      private$lines_private <- append(
-        x = self$lines,
-        value = line,
-        after = after_line_number
-      )
+      private$lines_private <- line |>
+        append(x = self$lines, after = after_line_number)
     },
 
     remove_line = function(line_number)
@@ -35,9 +32,9 @@ EidosBlock <- R6::R6Class(
       private$lines_private <- private$lines_private[-line_number]
     },
 
-    substitute_phrase = function(phrase, substitute)
+    substitute_phrase_in_lines = function(line_numbers, phrase, substitute)
     {
-      for(line in private$lines_private)
+      for(line in private$lines_private[line_numbers])
       {
         line$substitute_phrase(phrase, substitute)
       }
