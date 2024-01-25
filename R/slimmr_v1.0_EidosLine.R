@@ -21,10 +21,24 @@ EidosLine <- R6::R6Class(
       private$string_private <- new_string
     },
 
-    substitute_phrase = function(phrase, substitute)
+    substitute = function(phrase, substitute)
     {
       with_substitutions <- gsub(phrase, substitute, self$string, fixed = TRUE)
       self$overwrite(new_string = with_substitutions)
+    },
+
+    read_head = function(n_characters, ignore_whitespace = FALSE)
+    {
+      HEAD_START <- 1
+      string <- self$string
+
+      if (ignore_whitespace)
+      {
+        string <- trimws(string)
+      }
+
+      head <- substr(string, start = HEAD_START, stop = n_characters)
+      return(head)
     }
 
   ),
@@ -36,24 +50,37 @@ EidosLine <- R6::R6Class(
       return(private$string_private)
     },
 
-    is_toplevel = function()
+    is_empty = function()
     {
       EMPTY_LINE <- ""
-      NON_TOPLEVEL_FIRST_CHARACTERS <- c("  ", "\t", "//")
 
       if (self$string == EMPTY_LINE)
       {
-        return(FALSE)
+        return(TRUE)
       }
+      return(FALSE)
+    },
 
-      first_characters <- substr(self$string, start = 1, stop = 2)
+    is_toplevel = function()
+    {
+      NOT_TOPLEVEL_HEAD <- c("  ", "\t")
 
-      if (first_characters %in% NON_TOPLEVEL_FIRST_CHARACTERS)
+      if (self$read_head(n_characters = 2) %in% NOT_TOPLEVEL_HEAD)
       {
         return(FALSE)
       }
-
       return(TRUE)
+    },
+
+    is_comment = function()
+    {
+      COMMENT_HEAD <- "//"
+
+      if (self$read_head(n_characters = 2, ignore_whitespace = TRUE) == COMMENT_HEAD)
+      {
+        return(TRUE)
+      }
+      return(FALSE)
     },
 
     callback = function()
