@@ -40,8 +40,7 @@ EidosBlock <- R6::R6Class(
 
     change_callback = function(new_callback)
     {
-      FIRST_LINE <- 1
-      self$substitute_phrase_in_lines(FIRST_LINE, self$callback, new_callback)
+      self$substitute_phrase_in_lines(self$callback_line_number, self$callback, new_callback)
     }
 
   ),
@@ -50,9 +49,16 @@ EidosBlock <- R6::R6Class(
 
     callback = function()
     {
-      FIRST_LINE <- 1
-      callback <- self$lines[[FIRST_LINE]]$callback
+      callback <- self$lines[[self$callback_line_number]]$callback
       return(callback)
+    },
+
+    callback_line_number = function()
+    {
+      callback_line_number <- self$lines |>
+        sapply(function(line) ! is.null(line$callback)) |>
+        which.max()
+      return(callback_line_number)
     },
 
     lines = function()
