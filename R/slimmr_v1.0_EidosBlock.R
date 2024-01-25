@@ -8,39 +8,21 @@
 EidosBlock <- R6::R6Class(
 
   classname = "EidosBlock",
+  inherit = EidosComposition,
 
   public = list(
 
-    initialize = function(eidos_lines)
+    substitute = function(in_lines, phrase, substitute)
     {
-      for(line in eidos_lines)
+      for(line in self$lines[in_lines])
       {
-        self$add_line(line)
-      }
-    },
-
-    add_line = function(line, after_line_number = length(self$lines))
-    {
-      private$lines_private <- line |>
-        append(x = self$lines, after = after_line_number)
-    },
-
-    remove_line = function(line_number)
-    {
-      private$lines_private <- private$lines_private[-line_number]
-    },
-
-    substitute_phrase_in_lines = function(line_numbers, phrase, substitute)
-    {
-      for(line in private$lines_private[line_numbers])
-      {
-        line$substitute_phrase(phrase, substitute)
+        line$substitute(phrase, substitute)
       }
     },
 
     change_callback = function(new_callback)
     {
-      self$substitute_phrase_in_lines(self$callback_line_number, self$callback, new_callback)
+      self$substitute(self$callback_line_number, self$callback, new_callback)
     }
 
   ),
@@ -63,14 +45,8 @@ EidosBlock <- R6::R6Class(
 
     lines = function()
     {
-      return(private$lines_private)
+      return(private$elements)
     }
-
-  ),
-
-  private = list(
-
-    lines_private = list()
 
   )
 
