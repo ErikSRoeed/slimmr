@@ -11,29 +11,29 @@ EidosComposition <- R6::R6Class(
 
   public = list(
 
-    initialize = function(initial_elements)
+    initialize = function(items)
     {
-      for (element in initial_elements)
+      for (item in items)
       {
-        self$add_element(element)
+        self$add(item)
       }
     },
 
-    add_element = function(element, after_index = length(private$elements))
+    add = function(item, after_index = length(private$items))
     {
-      private$elements <- append(private$elements, element, after_index)
+      private$items <- append(private$items, item, after_index)
     },
 
-    remove_element = function(element_index)
+    remove = function(item_index)
     {
-      private$elements <- private$elements[-element_index]
+      private$items <- private$items[-item_index]
     }
 
   ),
 
   private = list(
 
-    elements = list()
+    items = list()
 
   )
 

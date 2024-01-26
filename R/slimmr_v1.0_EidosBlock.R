@@ -52,7 +52,7 @@ EidosBlock <- R6::R6Class(
 
     lines = function()
     {
-      return(private$elements)
+      return(private$items)
     }
 
   )
