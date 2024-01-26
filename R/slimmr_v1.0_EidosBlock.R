@@ -31,8 +31,15 @@ EidosBlock <- R6::R6Class(
 
     callback = function()
     {
-      callback <- self$lines[[self$callback_line_number]]$callback
-      return(callback)
+      callback_exists <- length(self$callback_line_number) != 0
+
+      if (callback_exists)
+      {
+        callback <- self$lines[[self$callback_line_number]]$callback
+        return(callback)
+      }
+
+      return(NULL)
     },
 
     callback_line_number = function()
