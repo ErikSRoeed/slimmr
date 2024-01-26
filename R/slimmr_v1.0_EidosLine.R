@@ -27,12 +27,12 @@ EidosLine <- R6::R6Class(
       self$overwrite(new_string = with_substitutions)
     },
 
-    read_head = function(n_characters, ignore_whitespace = FALSE)
+    read_head = function(n_characters, skip_whitespace = FALSE)
     {
       HEAD_START <- 1
       string <- self$string
 
-      if (ignore_whitespace)
+      if (skip_whitespace)
       {
         string <- trimws(string)
       }
@@ -63,9 +63,7 @@ EidosLine <- R6::R6Class(
 
     is_toplevel = function()
     {
-      NOT_TOPLEVEL_HEAD <- c("  ", "\t")
-
-      if (self$read_head(n_characters = 2) %in% NOT_TOPLEVEL_HEAD)
+      if (self$read_head(2, FALSE) != self$read_head(2, TRUE))
       {
         return(FALSE)
       }
@@ -76,7 +74,7 @@ EidosLine <- R6::R6Class(
     {
       COMMENT_HEAD <- "//"
 
-      if (self$read_head(n_characters = 2, ignore_whitespace = TRUE) == COMMENT_HEAD)
+      if (self$read_head(n_characters = 2, skip_whitespace = TRUE) == COMMENT_HEAD)
       {
         return(TRUE)
       }
@@ -95,22 +93,24 @@ EidosLine <- R6::R6Class(
     callback = function()
     {
       REGEX_OPENING_BRACKET <- "\\{"
-      BLANK <- ""
+      opening_bracket_index <- regexpr(REGEX_OPENING_BRACKET, self$string)
 
-      if (! self$is_toplevel)
+      putative_callback <- self$read_head(
+        n_characters = opening_bracket_index - 1,
+        skip_whitespace = TRUE) |>
+        trimws()
+
+      if (putative_callback == "")
       {
         return(NULL)
       }
 
-      string_has_opening_bracket <- grepl(REGEX_OPENING_BRACKET, self$string)
-
-      if (! string_has_opening_bracket)
+      if (! self$is_toplevel || self$is_comment)
       {
         return(NULL)
       }
 
-      callback <- gsub(REGEX_OPENING_BRACKET, BLANK, self$string) |> trimws()
-      return(callback)
+      return(putative_callback)
     }
 
   ),
