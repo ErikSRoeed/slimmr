@@ -83,6 +83,15 @@ EidosLine <- R6::R6Class(
       return(FALSE)
     },
 
+    is_callback = function()
+    {
+      if (! is.null(self$callback))
+      {
+        return(TRUE)
+      }
+      return(FALSE)
+    },
+
     callback = function()
     {
       REGEX_OPENING_BRACKET <- "\\{"
