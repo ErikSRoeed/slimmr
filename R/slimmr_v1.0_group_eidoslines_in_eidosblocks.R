@@ -1,5 +1,5 @@
 
-#' convert_to_blocks
+#' group_eidoslines_in_eidosblocks
 #'
 #' @description Internal slimmr function.
 #'
@@ -10,14 +10,14 @@
 #' @include slimmr_v1.0_EidosComposition.R
 #' @noRd
 #'
-convert_to_eidos_blocks <- function(eidos_lines)
+group_eidoslines_in_eidosblocks <- function(eidos_lines)
 {
-  stopifnot(is.list(eidos_lines))
-
-  check_eidos_line <- function(object) "EidosLine" %in% class(object)
-  inputs_are_valid <- sapply(eidos_lines, check_eidos_line)
-
-  stopifnot(all(inputs_are_valid))
+  eidos_lines |>
+    is.list() |>
+    stopifnot()
+  eidos_lines |>
+    check_list_contains_only_correct_class("EidosLine") |>
+    stopifnot(all())
 
   empty_first_block <- EidosBlock$new(items = list())
   blocks <- list(empty_first_block)

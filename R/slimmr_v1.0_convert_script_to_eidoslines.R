@@ -1,5 +1,5 @@
 
-#' convert_to_eidos_lines
+#' convert_script_to_eidoslines
 #'
 #' @description Internal slimmr function.
 #'
@@ -9,7 +9,7 @@
 #' @include slimmr_v1.0_EidosLine.R
 #' @noRd
 #'
-convert_to_eidos_lines <- function(script_lines)
+convert_script_to_eidoslines <- function(script_lines)
 {
   stopifnot(is.character(script_lines))
   stopifnot(! is.null(script_lines))
