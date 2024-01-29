@@ -26,12 +26,12 @@ check_list_contains_only_correct_class <- function(list, correct_class)
 #' @description Internal slimmr function.
 #'
 #' @param script_path Valid character path to a .slim script file.
-#' @param drop_empty_lines Boolean, default TRUE. Drop empty lines from script?
+#' @param drop_empty_lines Boolean, default FALSE. Drop empty lines from script?
 #' @returns A character vector with one item per line in the parsed script.
 #'
 #' @noRd
 #'
-parse_script <- function(script_path, drop_empty_lines = TRUE)
+parse_script <- function(script_path, drop_empty_lines = FALSE)
 {
   stopifnot(file.exists(script_path))
   script_lines <- readLines(script_path)
@@ -57,8 +57,8 @@ parse_script <- function(script_path, drop_empty_lines = TRUE)
 #'
 convert_script_to_eidoslines <- function(script_lines)
 {
-  stopifnot(is.character(script_lines))
-  stopifnot(! is.null(script_lines))
+  stopifnot(script_lines |> is.character())
+  stopifnot(script_lines |> is.null() |> isFALSE())
 
   line_numbers <- 1 : length(script_lines)
   eidos_lines <- list()
@@ -84,12 +84,12 @@ convert_script_to_eidoslines <- function(script_lines)
 #'
 group_eidoslines_in_eidosblocks <- function(eidos_lines)
 {
-  eidos_lines |>
-    is.list() |>
-    stopifnot()
-  eidos_lines |>
-    check_list_contains_only_correct_class("EidosLine") |>
-    stopifnot(all())
+  stopifnot(eidos_lines |> is.list())
+  stopifnot(
+    eidos_lines |>
+      check_list_contains_only_correct_class("EidosLine") |>
+      all()
+  )
 
   empty_first_block <- EidosBlock$new(items = list())
   blocks <- list(empty_first_block)
@@ -146,12 +146,12 @@ group_eidoslines_in_eidosblocks <- function(eidos_lines)
 #'
 construct_eidosmodel_from_eidosblocks <- function(name, eidos_blocks)
 {
-  eidos_blocks |>
-    is.list() |>
-    stopifnot()
-  eidos_blocks |>
-    check_list_contains_only_correct_class("EidosBlock") |>
-    stopifnot(all())
+  stopifnot(eidos_blocks |> is.list())
+  stopifnot(
+    eidos_blocks |>
+      check_list_contains_only_correct_class("EidosBlock") |>
+      all()
+  )
 
   model <- EidosModel$new(name = name, eidos_blocks = eidos_blocks)
   return(model)
