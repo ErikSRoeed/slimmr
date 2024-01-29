@@ -25,9 +25,46 @@ EidosModel <- R6::R6Class(
 
     print = function()
     {
-      # PLACEHOLDER PRINT FUNCTION
-      paste(self$name, " has ", length(self$blocks), " blocks.", sep = "") |>
-        print()
+      TAB = "\t"
+      HEAD = paste0("#", TAB)
+      NEWLINE = "\n"
+
+      paste0(HEAD, self$name, NEWLINE) |> cat()
+      paste0(HEAD, NEWLINE) |> cat()
+      paste0(HEAD, "Block count: ", self$block_count, NEWLINE) |> cat()
+      paste0(HEAD, "Line count: ", self$line_count, NEWLINE) |> cat()
+      paste0(HEAD, NEWLINE) |> cat()
+      paste0(HEAD, "Blocks:", NEWLINE) |> cat()
+      paste0(HEAD, NEWLINE) |> cat()
+
+      block_number <- 1
+      for (block in self$blocks)
+      {
+        block_header <- paste0("[", block_number, "] ")
+        paste0(HEAD, block_header, block$callback, NEWLINE) |> cat()
+        block_number <- block_number + 1
+      }
+
+      paste0(HEAD, NEWLINE) |> cat()
+      paste0(HEAD, "slimmr ", utils::packageVersion("slimmr"), NEWLINE) |> cat()
+    },
+
+    write_to_console = function()
+    {
+      TAB = "\t"
+      NEWLINE = "\n"
+      line_number <- 1
+
+      paste("#", TAB, self$name, NEWLINE, NEWLINE, sep = "") |> cat()
+
+      for (block in self$blocks)
+      {
+        for (line in block$lines)
+        {
+          paste(line_number, TAB, line$string, NEWLINE, sep = "") |> cat()
+          line_number <- line_number + 1
+        }
+      }
     },
 
     write_to_file = function(file_path, overwrite = FALSE)
@@ -67,6 +104,19 @@ EidosModel <- R6::R6Class(
     blocks = function()
     {
       return(private$items)
+    },
+
+    block_count = function()
+    {
+      return(length(self$blocks))
+    },
+
+    line_count = function()
+    {
+      sum_of_block_line_counts <- self$blocks |>
+        vapply(function(block) length(block$lines), integer(1)) |>
+        sum()
+      return(sum_of_block_line_counts)
     }
 
   ),
