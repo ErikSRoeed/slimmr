@@ -156,3 +156,25 @@ construct_eidosmodel_from_eidosblocks <- function(name, eidos_blocks)
   model <- EidosModel$new(name = name, eidos_blocks = eidos_blocks)
   return(model)
 }
+
+#' Write SLiM calls for the command line.
+#'
+#' @description Internal slimmr function.
+#'
+#' @param prefix SLiM call prefix, e.g. to call SLiM via bash from Windows.
+#' @param suffix Arguments to SLiM.
+#' @returns A SLiM command line call as a character string.
+#'
+#' @noRd
+#'
+write_slim_call <- function(prefix, suffix)
+{
+  slim_call <- trimws(prefix) |> paste(" '", "slim ", suffix, "'", sep = "")
+
+  if (is.null(prefix))
+  {
+    slim_call <- paste("slim", suffix)
+  }
+
+  return(slim_call)
+}
