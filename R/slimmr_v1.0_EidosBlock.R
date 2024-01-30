@@ -12,17 +12,9 @@ EidosBlock <- R6::R6Class(
 
   public = list(
 
-    substitute = function(in_lines, phrase, substitute)
-    {
-      for(line in self$lines[in_lines])
-      {
-        line$substitute(phrase, substitute)
-      }
-    },
-
     change_callback = function(new_callback)
     {
-      self$substitute(self$callback_line_number, self$callback, new_callback)
+      super$substitute(self$callback, new_callback)
     }
 
   ),

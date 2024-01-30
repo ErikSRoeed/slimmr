@@ -27,6 +27,14 @@ EidosComposition <- R6::R6Class(
     remove = function(item_index)
     {
       private$items <- private$items[-item_index]
+    },
+
+    substitute = function(phrase, substitute, in_items)
+    {
+      for (item in private$items[in_items])
+      {
+        item$substitute(phrase, substitute)
+      }
     }
 
   ),
