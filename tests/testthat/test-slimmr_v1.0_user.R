@@ -9,7 +9,7 @@ sample_script <- c(
   "}",
   "",
   "1 early() {",
-  "  sim.addSubpop(p1, 1000);",
+  "  sim.addSubpop('p1', 1000);",
   "}",
   "",
   "10000 late() { sim.outputFixedMutations(); }",
