@@ -42,6 +42,7 @@ inspect_eidos_script <- function(slim_model)
 #' @param model An EidosModel object.
 #' @param reps Number of replicate simulations.
 #' @param seed Random seed for simulations
+#' @param echo Echo all run details, output and diagnostics.
 #' @param output_parsing_function A function applied to raw output from SLiM
 #' @param include_runtime_diagnostics TRUE / FALSE - Output CPU and RAM usage?
 #' @param syscall_wrapper Wrapper amended to system call for calling slim (if it
@@ -56,6 +57,7 @@ run_slim <- function(
     model,
     reps = 1,
     seed = NULL,
+    echo = TRUE,
     output_parsing_function = NULL,
     include_runtime_diagnostics = FALSE,
     syscall_wrapper = NULL,
@@ -98,10 +100,35 @@ run_slim <- function(
     arguments = slim_arguments
   )
 
-  cat("", "System call:", slim_call, "", sep = "\n")
+  output_data_structure <- list(
+    seed = seed,
+    constants = constants,
+    system_call = slim_call,
+    replicate_runs = reps,
+    slim_outputs = list()
+  )
+
+  if (echo)
+  {
+    cat("", "System call:", slim_call, "", sep = "\n")
+  }
+
   for (rep in 1 : reps)
   {
     slim_output <- system(slim_call, intern = TRUE)
-    cat(slim_output, "", sep = "\n")
+
+    if (echo)
+    {
+      cat(slim_output, "", sep = "\n")
+    }
+
+    if (! is.null(output_parsing_function))
+    {
+      slim_output <- output_parsing_function(slim_output)
+    }
+
+    output_data_structure$slim_outputs[[rep]] <- slim_output
   }
+
+  return(output_data_structure)
 }
