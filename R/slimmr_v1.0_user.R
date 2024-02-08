@@ -41,32 +41,67 @@ inspect_eidos_script <- function(slim_model)
 #'
 #' @param model An EidosModel object.
 #' @param reps Number of replicate simulations.
-#' @param syscall_prefix Prefix amended to system call for calling slim (if it
+#' @param seed Random seed for simulations
+#' @param output_parsing_function A function applied to raw output from SLiM
+#' @param include_runtime_diagnostics TRUE / FALSE - Output CPU and RAM usage?
+#' @param syscall_wrapper Wrapper amended to system call for calling slim (if it
 #' is not installed on the PATH, must be called via WSL or MSYS2/MINGW64, etc.)
+#' @param ... Named constant arguments to SLiM (i.e. passed to -d / -define)
 #' @return Either the raw output from SLiM, or that output as parsed by
 #' output_parse_function.
 #'
 #' @export
 #'
-run_slim <- function(model, reps, syscall_prefix = NULL)
+run_slim <- function(
+    model,
+    reps = 1,
+    seed = NULL,
+    output_parsing_function = NULL,
+    include_runtime_diagnostics = FALSE,
+    syscall_wrapper = NULL,
+    ...
+)
 {
-  SLIM_CALL_FAIL_CODE = 127
-  test_slim_call <- write_slim_call(syscall_prefix, suffix = " --version")
-
-  if (try(system(test_slim_call)) == SLIM_CALL_FAIL_CODE)
-  {
-    stop("SLiM call failed. Is SLiM on your PATH? (See also syscall_prefix.)")
-  }
-
+  check_slim_installation(syscall_wrapper = syscall_wrapper)
   temporary_script_path <- tempfile(fileext = ".slim")
   model$write_to_file(file_path = temporary_script_path)
-  path_argument <- paste('"', temporary_script_path, '"', sep = "")
 
-  slim_call <- write_slim_call(prefix = syscall_prefix, suffix = path_argument)
+  slim_argument_path <- paste('"', temporary_script_path, '"', sep = "")
+  slim_argument_seed <- ifelse(is.null(seed), "", paste("-s", seed))
+  slim_argument_cpu <- ifelse(! include_runtime_diagnostics, "", "-time")
+  slim_argument_ram <- ifelse(! include_runtime_diagnostics, "", "-mem")
 
+  constants <- list(...)
+  if (length(constants) == 0)
+  {
+    slim_arguments_constants <- ""
+  }
+  else
+  {
+    slim_arguments_constants <- paste(
+      "-d ", names(constants), "=", constants,
+      collapse = " ", sep = ""
+    )
+  }
+
+  slim_arguments <- paste(
+    slim_argument_seed,
+    slim_argument_cpu,
+    slim_argument_ram,
+    slim_arguments_constants,
+    slim_argument_path,
+    sep = " "
+  )
+
+  slim_call <- write_slim_call(
+    wrapper = syscall_wrapper,
+    arguments = slim_arguments
+  )
+
+  cat("", "System call:", slim_call, "", sep = "\n")
   for (rep in 1 : reps)
   {
-    slim_output <- system(slim_call, intern = TRUE, ignore.stderr = TRUE)
-    cat(slim_output, sep = "\n")
+    slim_output <- system(slim_call, intern = TRUE)
+    cat(slim_output, "", sep = "\n")
   }
 }
