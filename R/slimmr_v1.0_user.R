@@ -46,6 +46,7 @@ inspect_eidos_script <- function(slim_model)
 #' @param output_parsing_function A function applied to raw output from SLiM
 #' @param syscall_wrapper Wrapper amended to system call for calling slim (if it
 #' is not installed on the PATH, must be called via WSL or MSYS2/MINGW64, etc.)
+#' @param parallel_nodes Number of load balancing parallel nodes to use.
 #' @param ... Named constant arguments to SLiM (i.e. passed to -d / -define)
 #' @return Either the raw output from SLiM, or that output as parsed by
 #' output_parse_function.
