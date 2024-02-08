@@ -42,9 +42,8 @@ inspect_eidos_script <- function(slim_model)
 #' @param model An EidosModel object.
 #' @param reps Number of replicate simulations.
 #' @param seed Random seed for simulations
-#' @param echo Echo all run details, output and diagnostics.
+#' @param slim_output_verbosity An integer 0 - 2.
 #' @param output_parsing_function A function applied to raw output from SLiM
-#' @param include_runtime_diagnostics TRUE / FALSE - Output CPU and RAM usage?
 #' @param syscall_wrapper Wrapper amended to system call for calling slim (if it
 #' is not installed on the PATH, must be called via WSL or MSYS2/MINGW64, etc.)
 #' @param ... Named constant arguments to SLiM (i.e. passed to -d / -define)
@@ -57,10 +56,10 @@ run_slim <- function(
     model,
     reps = 1,
     seed = NULL,
-    echo = TRUE,
-    output_parsing_function = NULL,
-    include_runtime_diagnostics = FALSE,
+    slim_output_verbosity = 1,
+    output_parsing_function = function(x) return(x),
     syscall_wrapper = NULL,
+    parallel_nodes = 1,
     ...
 )
 {
@@ -70,8 +69,7 @@ run_slim <- function(
 
   slim_argument_path <- paste('"', temporary_script_path, '"', sep = "")
   slim_argument_seed <- ifelse(is.null(seed), "", paste("-s", seed))
-  slim_argument_cpu <- ifelse(! include_runtime_diagnostics, "", "-time")
-  slim_argument_ram <- ifelse(! include_runtime_diagnostics, "", "-mem")
+  slim_argument_verbosity <- paste("-l", slim_output_verbosity)
 
   constants <- list(...)
   if (length(constants) == 0)
@@ -88,8 +86,7 @@ run_slim <- function(
 
   slim_arguments <- paste(
     slim_argument_seed,
-    slim_argument_cpu,
-    slim_argument_ram,
+    slim_argument_verbosity,
     slim_arguments_constants,
     slim_argument_path,
     sep = " "
@@ -104,31 +101,33 @@ run_slim <- function(
     seed = seed,
     constants = constants,
     system_call = slim_call,
-    replicate_runs = reps,
-    slim_outputs = list()
+    replicate_runs = reps
   )
 
-  if (echo)
-  {
-    cat("", "System call:", slim_call, "", sep = "\n")
-  }
+  node_export_list <- list(
+    slim_call = slim_call,
+    output_parsing_function = output_parsing_function
+    )
 
-  for (rep in 1 : reps)
-  {
-    slim_output <- system(slim_call, intern = TRUE)
+  cluster <- parallel::makeCluster(parallel_nodes)
+  cluster |> parallel::clusterExport(
+    varlist = names(node_export_list),
+    envir = list2env(node_export_list)
+  )
 
-    if (echo)
+  slim_outputs <- parallel::clusterApplyLB(
+    cl = cluster,
+    x = seq(reps),
+    fun = function(rep)
     {
-      cat(slim_output, "", sep = "\n")
+      slim_output <- system(slim_call, intern = TRUE) |>
+        output_parsing_function()
+      return(slim_output)
     }
+  )
 
-    if (! is.null(output_parsing_function))
-    {
-      slim_output <- output_parsing_function(slim_output)
-    }
+  parallel::stopCluster(cluster)
 
-    output_data_structure$slim_outputs[[rep]] <- slim_output
-  }
-
+  output_data_structure$slim_outputs <- slim_outputs
   return(output_data_structure)
 }
