@@ -2,7 +2,4 @@
 
 export(import_slim_model)
 export(inspect_eidos_script)
-export(newSlimModel)
 export(run_slim)
-import(R6)
-import(parallel)
