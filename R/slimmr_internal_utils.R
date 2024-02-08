@@ -52,7 +52,6 @@ parse_script <- function(script_path, drop_empty_lines = FALSE)
 #' @param script_lines char. vector of script lines from slimmr::parse_script().
 #' @returns A list() of slimmr::EidosLine objects.
 #'
-#' @include slimmr_v1.0_EidosLine.R
 #' @noRd
 #'
 convert_script_to_eidoslines <- function(script_lines)
@@ -78,8 +77,6 @@ convert_script_to_eidoslines <- function(script_lines)
 #' @param eidos_lines A list() of slimmr::EidosLine objects.
 #' @returns A list of slimmr::EidosBlock objects.
 #'
-#' @include slimmr_v1.0_EidosBlock.R
-#' @include slimmr_v1.0_EidosComposition.R
 #' @noRd
 #'
 group_eidoslines_in_eidosblocks <- function(eidos_lines)
@@ -140,8 +137,6 @@ group_eidoslines_in_eidosblocks <- function(eidos_lines)
 #' @param eidos_blocks A list() of slimmr::EidosBlock objects.
 #' @returns An EidosModel object.
 #'
-#' @include slimmr_v1.0_EidosModel.R
-#' @include slimmr_v1.0_EidosComposition.R
 #' @noRd
 #'
 construct_eidosmodel_from_eidosblocks <- function(name, eidos_blocks)
