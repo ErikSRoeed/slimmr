@@ -44,8 +44,9 @@ inspect_eidos_script <- function(slim_model)
 #' @param seed Random seed for simulations
 #' @param slim_output_verbosity An integer 0 - 2.
 #' @param output_parsing_function A function applied to raw output from SLiM
-#' @param slim_command Full path to SLiM executable. Default "slim" if on PATH.
 #' @param parallel_nodes Number of load balancing parallel nodes to use.
+#' @param slim_command Full path to SLiM executable. Default "slim" if on PATH.
+#' @param output_runtime_diagnostics TRUE/FALSE. Output CPU and RAM usage?
 #' @param ... Named constant arguments to SLiM (i.e. passed to -d / -define)
 #' @return Either the raw output from SLiM, or that output as parsed by
 #' output_parse_function.
@@ -60,6 +61,7 @@ run_slim <- function(
     output_parsing_function = function(x) return(x),
     parallel_nodes = 1,
     slim_command = "slim",
+    output_runtime_diagnostics = FALSE,
     ...
 )
 {
@@ -68,8 +70,10 @@ run_slim <- function(
   model$write_to_file(file_path = temporary_script_path)
 
   slim_argument_path <- paste('"', temporary_script_path, '"', sep = "")
-  slim_argument_seed <- ifelse(is.null(seed), "", paste("-s", seed))
   slim_argument_verbosity <- paste("-l", slim_output_verbosity)
+  slim_argument_seed <- ifelse(is.null(seed), "", paste("-s", seed))
+  slim_argument_cpu <- ifelse(output_runtime_diagnostics, "-t", "")
+  slim_argument_ram <- ifelse(output_runtime_diagnostics, "-m", "")
 
   constants <- list(...)
   if (length(constants) == 0)
@@ -86,6 +90,8 @@ run_slim <- function(
 
   slim_arguments <- paste(
     slim_argument_seed,
+    slim_argument_cpu,
+    slim_argument_ram,
     slim_argument_verbosity,
     slim_arguments_constants,
     slim_argument_path,

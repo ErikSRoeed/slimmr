@@ -12,6 +12,7 @@ run_slim(
   output_parsing_function = function(x) return(x),
   parallel_nodes = 1,
   slim_command = "slim",
+  output_runtime_diagnostics = FALSE,
   ...
 )
 }
@@ -29,6 +30,8 @@ run_slim(
 \item{parallel_nodes}{Number of load balancing parallel nodes to use.}
 
 \item{slim_command}{Full path to SLiM executable. Default "slim" if on PATH.}
+
+\item{output_runtime_diagnostics}{TRUE/FALSE. Output CPU and RAM usage?}
 
 \item{...}{Named constant arguments to SLiM (i.e. passed to -d / -define)}
 }
