@@ -2,4 +2,8 @@
 
 export(import_slim_model)
 export(inspect_eidos_script)
+export(move_block)
+export(remove_blocks)
+export(remove_lines)
 export(run_slim)
+export(substitute_eidos_pattern)

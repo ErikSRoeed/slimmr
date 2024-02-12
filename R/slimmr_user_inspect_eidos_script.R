@@ -1,3 +1,4 @@
+
 #' Inspect the Eidos script of a SLiM model.
 #'
 #' @description This functions outputs the script contained in an EidosModel
