@@ -69,32 +69,23 @@ run_slim <- function(
   temporary_script_path <- tempfile(fileext = ".slim")
   model$write_to_file(file_path = temporary_script_path)
 
-  slim_argument_path <- paste('"', temporary_script_path, '"', sep = "")
-  slim_argument_verbosity <- paste("-l", slim_output_verbosity)
-  slim_argument_seed <- ifelse(is.null(seed), "", paste("-s", seed))
-  slim_argument_cpu <- ifelse(output_runtime_diagnostics, "-t", "")
-  slim_argument_ram <- ifelse(output_runtime_diagnostics, "-m", "")
-
   constants <- list(...)
-  if (length(constants) == 0)
-  {
-    slim_arguments_constants <- ""
-  }
-  else
-  {
-    slim_arguments_constants <- paste(
+  slim_arguments <- paste(
+    paste(
+      ifelse(output_runtime_diagnostics, "-t", ""),
+      ifelse(output_runtime_diagnostics, "-m", ""),
+      paste("-l", slim_output_verbosity),
+      ifelse(is.null(seed), "", paste("-s", seed)),
+      sep = " "
+    ),
+    paste(
       "-d ", names(constants), "=", constants,
       collapse = " ", sep = ""
-    )
-  }
-
-  slim_arguments <- paste(
-    slim_argument_seed,
-    slim_argument_cpu,
-    slim_argument_ram,
-    slim_argument_verbosity,
-    slim_arguments_constants,
-    slim_argument_path,
+    ),
+    paste(
+      '"', temporary_script_path, '"',
+      sep = ""
+    ),
     sep = " "
   )
 
