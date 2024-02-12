@@ -57,13 +57,10 @@ EidosModel <- R6::R6Class(
 
       paste("#", TAB, self$name, NEWLINE, NEWLINE, sep = "") |> cat()
 
-      for (block in self$blocks)
+      for (line in self$lines)
       {
-        for (line in block$lines)
-        {
-          paste(line_number, TAB, line$string, NEWLINE, sep = "") |> cat()
-          line_number <- line_number + 1
-        }
+        paste(line_number, TAB, line$string, NEWLINE, sep = "") |> cat()
+        line_number <- line_number + 1
       }
     },
 
@@ -80,13 +77,9 @@ EidosModel <- R6::R6Class(
 
       file_connection <- file(file_path, open = "wt")
 
-      for (block in self$blocks)
+      for (line in self$lines)
       {
-        for (line in block$lines)
-        {
-          writeLines(text = line$string, con = file_connection)
-        }
-        writeLines(text = "", con = file_connection)
+        writeLines(text = line$string, con = file_connection)
       }
 
       close(file_connection)
@@ -106,6 +99,15 @@ EidosModel <- R6::R6Class(
       return(private$items)
     },
 
+    lines = function()
+    {
+      lines <- lapply(
+        self$blocks,
+        function(block) return(block$lines)
+      ) |> unlist()
+      return(lines)
+    },
+
     block_count = function()
     {
       return(length(self$blocks))
@@ -113,10 +115,7 @@ EidosModel <- R6::R6Class(
 
     line_count = function()
     {
-      sum_of_block_line_counts <- self$blocks |>
-        vapply(function(block) length(block$lines), integer(1)) |>
-        sum()
-      return(sum_of_block_line_counts)
+      return(length(self$lines))
     }
 
   ),
