@@ -44,8 +44,7 @@ inspect_eidos_script <- function(slim_model)
 #' @param seed Random seed for simulations
 #' @param slim_output_verbosity An integer 0 - 2.
 #' @param output_parsing_function A function applied to raw output from SLiM
-#' @param syscall_wrapper Wrapper amended to system call for calling slim (if it
-#' is not installed on the PATH, must be called via WSL or MSYS2/MINGW64, etc.)
+#' @param slim_command Full path to SLiM executable. Default "slim" if on PATH.
 #' @param parallel_nodes Number of load balancing parallel nodes to use.
 #' @param ... Named constant arguments to SLiM (i.e. passed to -d / -define)
 #' @return Either the raw output from SLiM, or that output as parsed by
@@ -59,12 +58,12 @@ run_slim <- function(
     seed = NULL,
     slim_output_verbosity = 1,
     output_parsing_function = function(x) return(x),
-    syscall_wrapper = NULL,
     parallel_nodes = 1,
+    slim_command = "slim",
     ...
 )
 {
-  check_slim_installation(syscall_wrapper = syscall_wrapper)
+  check_slim_installation(slim_command)
   temporary_script_path <- tempfile(fileext = ".slim")
   model$write_to_file(file_path = temporary_script_path)
 
@@ -93,27 +92,24 @@ run_slim <- function(
     sep = " "
   )
 
-  slim_call <- write_slim_call(
-    wrapper = syscall_wrapper,
-    arguments = slim_arguments
-  )
-
   output_data_structure <- list(
+    script = readLines(temporary_script_path),
     seed = seed,
     constants = constants,
-    system_call = slim_call,
+    system_call = paste(slim_command, slim_arguments),
     replicate_runs = reps
   )
 
-  node_export_list <- list(
-    slim_call = slim_call,
+  export_to_nodes <- list(
+    slim_command = slim_command,
+    slim_arguments = slim_arguments,
     output_parsing_function = output_parsing_function
-    )
+  )
 
   cluster <- parallel::makeCluster(parallel_nodes)
   cluster |> parallel::clusterExport(
-    varlist = names(node_export_list),
-    envir = list2env(node_export_list)
+    varlist = names(export_to_nodes),
+    envir = list2env(export_to_nodes)
   )
 
   slim_outputs <- parallel::clusterApplyLB(
@@ -121,8 +117,13 @@ run_slim <- function(
     x = seq(reps),
     fun = function(rep)
     {
-      slim_output <- system(slim_call, intern = TRUE) |>
-        output_parsing_function()
+      slim_output <- system2(
+        slim_command,
+        slim_arguments,
+        stdout = TRUE,
+        stderr = TRUE
+      ) |> output_parsing_function()
+
       return(slim_output)
     }
   )

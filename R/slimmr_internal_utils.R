@@ -152,38 +152,21 @@ construct_eidosmodel_from_eidosblocks <- function(name, eidos_blocks)
   return(model)
 }
 
-#' Write SLiM calls for the command line.
+#' Check SLiM installation.
 #'
-#' @description Internal slimmr function.
+#' @description Internal slimmr function. Attempt "slim -version". Stop if fail.
 #'
-#' @param wrapper SLiM call wrapper, e.g. to call SLiM via bash from Windows.
-#' @param arguments Arguments to SLiM.
-#' @returns A SLiM command line call as a character string.
+#' @param slim_command Full path to SLiM executable, or just "slim" if on PATH.
+#' @returns Void.
 #'
 #' @noRd
 #'
-write_slim_call <- function(wrapper, arguments)
-{
-  slim_call <- trimws(wrapper) |> paste(" '", "slim ", arguments, "'", sep = "")
-
-  if (is.null(wrapper))
-  {
-    slim_call <- paste("slim", arguments)
-  }
-
-  return(slim_call)
-}
-
-check_slim_installation <- function(syscall_wrapper)
+check_slim_installation <- function(slim_command = "slim")
 {
   SLIM_CALL_FAILED_CODE = 127
+  slim_call_attempt <- try(system2(slim_command, "-version"))
 
-  slim_version_syscall <- write_slim_call(
-    wrapper = syscall_wrapper,
-    arguments = " --version"
-  )
-
-  if (try(system(slim_version_syscall)) == SLIM_CALL_FAILED_CODE)
+  if (slim_call_attempt == SLIM_CALL_FAILED_CODE)
   {
     stop("SLiM call failed. Is SLiM installed and on your PATH?")
   }

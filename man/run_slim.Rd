@@ -10,8 +10,8 @@ run_slim(
   seed = NULL,
   slim_output_verbosity = 1,
   output_parsing_function = function(x) return(x),
-  syscall_wrapper = NULL,
   parallel_nodes = 1,
+  slim_command = "slim",
   ...
 )
 }
@@ -26,10 +26,9 @@ run_slim(
 
 \item{output_parsing_function}{A function applied to raw output from SLiM}
 
-\item{syscall_wrapper}{Wrapper amended to system call for calling slim (if it
-is not installed on the PATH, must be called via WSL or MSYS2/MINGW64, etc.)}
-
 \item{parallel_nodes}{Number of load balancing parallel nodes to use.}
+
+\item{slim_command}{Full path to SLiM executable. Default "slim" if on PATH.}
 
 \item{...}{Named constant arguments to SLiM (i.e. passed to -d / -define)}
 }
