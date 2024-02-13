@@ -4,7 +4,7 @@
 #' @description Branches (copies) a slimmr SLiM model with all its components.
 #'
 #' @param slim_model An EidosModel object.
-#' @param branch_model_name Name for the branched model.
+#' @param branch_name Name for the branched model.
 #' @returns A complete copy of the slim_model, with all references to the
 #' original model severed. Branched models are entirely separate.
 #'
