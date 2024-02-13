@@ -49,21 +49,6 @@ EidosModel <- R6::R6Class(
       paste0(HEAD, "slimmr ", utils::packageVersion("slimmr"), NEWLINE) |> cat()
     },
 
-    write_to_console = function()
-    {
-      TAB = "\t"
-      NEWLINE = "\n"
-      line_number <- 1
-
-      paste("#", TAB, self$name, NEWLINE, NEWLINE, sep = "") |> cat()
-
-      for (line in self$lines)
-      {
-        paste(line_number, TAB, line$string, NEWLINE, sep = "") |> cat()
-        line_number <- line_number + 1
-      }
-    },
-
     write_to_file = function(file_path, overwrite = FALSE)
     {
       if (file.exists(file_path))

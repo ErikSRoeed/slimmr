@@ -35,6 +35,16 @@ EidosComposition <- R6::R6Class(
       {
         item$substitute(phrase, substitute)
       }
+    },
+
+    get_lines_as_character = function()
+    {
+      as_character <- self$lines |>
+        vapply(
+          function(line) return(line$string),
+          character(1)
+        )
+      return(as_character)
     }
 
   ),
