@@ -1,14 +1,16 @@
 Package: slimmr
 Type: Package
 Title: SLiM Models in R
-Version: 0.2.0
-Date: 2020-07-10
+Version: 1.0.0
+Date: 2024-01-13
 Authors@R: person("Erik Sandertun", "Roeed", email = "e.roeed@uq.net.au", role = c("aut", "cre"))
 Author: Erik Sandertun Roeed [aut, cre]
 Maintainer: Erik Sandertun Roeed <e.roeed@uq.net.au>
-Description: An R package for running and interfacing with SLiM, writing and manipulating SLiM models, and processing SLiM output.
+Description: A minimalistic interface that runs and manipulates SLiM models in R.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.6.0), R6 (>= 2.4.1), parallel (>= 3.6.2)
-RoxygenNote: 7.1.0
+Depends: R (>= 4.3), R6 (>= 2.5.1), parallel (>= 4.3.2), utils (>= 4.3.2)
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.2.3
